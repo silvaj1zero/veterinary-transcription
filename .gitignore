@@ -1,0 +1,43 @@
+# Ambiente virtual
+venv/
+env/
+ENV/
+
+# Arquivos Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# API Keys e configurações sensíveis
+.env
+
+# Dados de processamento
+audios/*.mp3
+audios/*.wav
+audios/*.m4a
+audios/*.ogg
+audios/*.flac
+transcricoes/
+relatorios/
+
+# Manter estrutura de pastas mas ignorar conteúdo
+!audios/.gitkeep
+!transcricoes/.gitkeep
+!relatorios/.gitkeep
+
+# Logs
+*.log
+cost_log.txt
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Sistema
+.DS_Store
+Thumbs.db
