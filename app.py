@@ -404,7 +404,7 @@ if menu == "📊 Dashboard":
                 title="Tipo de Atendimento",
                 height=300
             )
-            st.plotly_chart(fig_pie, use_container_width=True)
+            st.plotly_chart(fig_pie, width='stretch')
 
         with col2:
             # Gráfico de barras - consultas por dia (mock data)
@@ -421,7 +421,7 @@ if menu == "📊 Dashboard":
                 height=300,
                 yaxis_title="Quantidade"
             )
-            st.plotly_chart(fig_bar, use_container_width=True)
+            st.plotly_chart(fig_bar, width='stretch')
 
 elif menu == "➕ Nova Consulta":
     st.markdown('<p class="main-header">➕ Nova Consulta Veterinária</p>', unsafe_allow_html=True)
@@ -511,7 +511,7 @@ elif menu == "➕ Nova Consulta":
                 tipo_atendimento = st.selectbox("Tipo de Atendimento", ["Presencial", "Videoconferência"])
 
             st.markdown("")
-            submitted = st.form_submit_button("🚀 Gerar Relatório", use_container_width=True)
+            submitted = st.form_submit_button("🚀 Gerar Relatório", width='stretch')
 
             if submitted:
                 # Preparar dados do paciente
@@ -604,7 +604,7 @@ elif menu == "➕ Nova Consulta":
                 data=md_content,
                 file_name=report_path.name,
                 mime="text/markdown",
-                use_container_width=True
+                width='stretch'
             )
 
         with col_txt:
@@ -615,7 +615,7 @@ elif menu == "➕ Nova Consulta":
                 data=txt_content,
                 file_name=txt_filename,
                 mime="text/plain",
-                use_container_width=True
+                width='stretch'
             )
 
         with col_pdf:
@@ -626,7 +626,7 @@ elif menu == "➕ Nova Consulta":
                 data=pdf_bytes,
                 file_name=pdf_filename,
                 mime="application/pdf",
-                use_container_width=True
+                width='stretch'
             )
 
         # Preview do relatório
@@ -710,7 +710,7 @@ elif menu == "📋 Histórico":
                             file_name=report['arquivo'],
                             mime="text/markdown",
                             key=f"download_md_hist_{idx}",
-                            use_container_width=True
+                            width='stretch'
                         )
 
                     with col_txt_h:
@@ -722,7 +722,7 @@ elif menu == "📋 Histórico":
                             file_name=txt_filename_h,
                             mime="text/plain",
                             key=f"download_txt_hist_{idx}",
-                            use_container_width=True
+                            width='stretch'
                         )
 
                     with col_pdf_h:
@@ -734,7 +734,7 @@ elif menu == "📋 Histórico":
                             file_name=pdf_filename_h,
                             mime="application/pdf",
                             key=f"download_pdf_hist_{idx}",
-                            use_container_width=True
+                            width='stretch'
                         )
     else:
         st.info("Nenhuma consulta encontrada com os filtros aplicados.")
