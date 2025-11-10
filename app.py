@@ -315,6 +315,26 @@ with st.sidebar:
 if menu == "📊 Dashboard":
     st.markdown('<p class="main-header">🏥 Dashboard do Sistema</p>', unsafe_allow_html=True)
 
+    # Verificar se há um relatório para visualizar
+    if 'view_report' in st.session_state and st.session_state['view_report']:
+        report_path = st.session_state['view_report']
+
+        st.markdown("---")
+        st.subheader(f"📄 Visualizando: {report_path.name}")
+
+        try:
+            with open(report_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+                st.markdown(content)
+        except Exception as e:
+            st.error(f"Erro ao ler relatório: {e}")
+
+        if st.button("⬅️ Voltar ao Dashboard"):
+            del st.session_state['view_report']
+            st.rerun()
+
+        st.markdown("---")
+
     # Métricas principais
     col1, col2, col3, col4 = st.columns(4)
 
