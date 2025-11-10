@@ -1,0 +1,11 @@
+# Railway configuration
+# Force Python 3.11 (Whisper not compatible with 3.13)
+
+[phases.setup]
+nixPkgs = ["python311", "ffmpeg"]
+
+[phases.install]
+cmds = ["pip install --upgrade pip", "pip install -r requirements.txt"]
+
+[start]
+cmd = "streamlit run app.py --server.port=$PORT --server.address=0.0.0.0"
