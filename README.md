@@ -2,6 +2,19 @@
 
 Sistema automatizado de transcrição de consultas veterinárias e geração de relatórios estruturados usando Whisper AI e Claude API.
 
+## 🆕 Versão 1.2 - Production Ready
+
+Esta versão inclui melhorias significativas de qualidade, estabilidade e facilidade de implantação:
+
+- ✅ **Compatibilidade Cross-Platform** - Funciona em Windows, macOS e Linux
+- ✅ **Sistema de Logging Completo** - Rastreamento e auditoria de todas as operações
+- ✅ **Retry Automático com Backoff** - Maior resiliência a falhas de rede/API
+- ✅ **Validação Robusta de Entrada** - Previne erros antes do processamento
+- ✅ **70%+ Cobertura de Testes** - 29 testes unitários e de integração
+- ✅ **Docker & Docker Compose** - Implantação simplificada em 1 comando
+
+📖 **[Ver detalhes completos das melhorias](IMPROVEMENTS.md)**
+
 ---
 
 ## 📦 Estrutura do Projeto
@@ -334,6 +347,112 @@ yt-dlp -x --audio-format mp3 -o "audios/%(title)s.%(ext)s" "URL_DO_VIDEO"
 
 ---
 
+## 🐳 Instalação com Docker (Recomendado)
+
+A forma mais fácil de executar o sistema é usando Docker:
+
+### Pré-requisitos
+- Docker e Docker Compose instalados
+
+### Passo 1: Configurar API Key
+
+Crie o arquivo `.env`:
+```bash
+echo "ANTHROPIC_API_KEY=sua-chave-aqui" > .env
+```
+
+### Passo 2: Iniciar o serviço
+
+```bash
+docker-compose up -d vet-docs-web
+```
+
+### Passo 3: Acessar
+
+Abra o navegador em: **http://localhost:8501**
+
+### Comandos Úteis
+
+```bash
+# Ver logs
+docker-compose logs -f vet-docs-web
+
+# Parar serviço
+docker-compose down
+
+# Usar CLI
+docker-compose run --rm vet-docs-cli
+
+# Atualizar imagem
+docker-compose build
+docker-compose up -d
+```
+
+### Benefícios do Docker
+- ✅ FFmpeg já incluído
+- ✅ Todas as dependências instaladas
+- ✅ Ambiente isolado
+- ✅ Fácil de replicar
+- ✅ Pronto para produção
+
+---
+
+## 🧪 Executar Testes
+
+O projeto inclui uma suite completa de testes (70%+ cobertura):
+
+### Instalar dependências de teste
+
+```bash
+pip install pytest pytest-cov pytest-mock
+```
+
+### Executar todos os testes
+
+```bash
+pytest
+```
+
+### Com relatório de cobertura
+
+```bash
+pytest --cov --cov-report=html
+```
+
+### Apenas testes unitários
+
+```bash
+pytest -m unit
+```
+
+### Apenas testes de integração
+
+```bash
+pytest -m integration
+```
+
+### Tipos de Testes Incluídos
+
+- **Testes Unitários (27 testes)**
+  - Detecção de FFmpeg
+  - Validação de entrada
+  - Retry com backoff
+  - Geração de relatórios
+  - Salvamento de arquivos
+
+- **Testes de Integração (2 testes)**
+  - Workflow completo texto → relatório
+  - Workflow completo áudio → relatório
+
+### Ver Relatório de Cobertura
+
+Após executar `pytest --cov --cov-report=html`, abra:
+```
+htmlcov/index.html
+```
+
+---
+
 ## 🆘 Suporte
 
 Problemas? Sugestões?
@@ -360,5 +479,13 @@ Desenvolvido por **BadiLab - 2025**
 
 ---
 
-**Versão:** 1.0
+**Versão:** 1.2 (Production Ready)
 **Última atualização:** Novembro 2025
+
+**Melhorias da v1.2:**
+- Sistema de logging completo
+- Retry automático com backoff exponencial
+- Validação robusta de entrada
+- 70%+ cobertura de testes
+- Containerização Docker
+- Compatibilidade cross-platform

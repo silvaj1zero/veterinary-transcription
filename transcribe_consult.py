@@ -13,14 +13,31 @@ from tqdm import tqdm
 import sys
 import json
 import os
+import logging
 from dotenv import load_dotenv
 import config
-
-# Configurar caminho do FFmpeg
-os.environ['PATH'] = r'C:\Users\Zero\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-8.0-full_build\bin;' + os.environ['PATH']
+from utils import setup_ffmpeg, validate_patient_info, retry_with_backoff
 
 # Carregar variáveis de ambiente
 load_dotenv()
+
+# Configurar logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('veterinary_system.log', encoding='utf-8'),
+        logging.StreamHandler()
+    ]
+)
+
+# Configurar FFmpeg (cross-platform)
+try:
+    setup_ffmpeg()
+except EnvironmentError as e:
+    logging.error(f"Erro ao configurar FFmpeg: {e}")
+    print(f"\nERRO - {e}")
+    sys.exit(1)
 
 class VeterinaryTranscription:
     """
@@ -36,6 +53,7 @@ class VeterinaryTranscription:
                                  Se False, carrega apenas o cliente Anthropic
         """
         print("Inicializando sistema...")
+        logging.info("Inicializando VeterinaryTranscription")
 
         # Whisper será carregado sob demanda
         self.whisper_model = None
@@ -43,15 +61,18 @@ class VeterinaryTranscription:
 
         # Inicializar cliente Anthropic
         if not config.ANTHROPIC_API_KEY:
+            logging.error("ANTHROPIC_API_KEY não encontrada")
             raise ValueError("ERRO - ANTHROPIC_API_KEY não encontrada! Configure no arquivo .env")
 
         self.anthropic_client = anthropic.Anthropic(
             api_key=config.ANTHROPIC_API_KEY
         )
         print("OK - Cliente Anthropic inicializado!")
+        logging.info("Cliente Anthropic inicializado")
 
         # Carregar template de prompt
         self.prompt_template = self._load_prompt_template()
+        logging.info("Sistema inicializado com sucesso")
 
     def _ensure_whisper_loaded(self):
         """Carrega o modelo Whisper se ainda não estiver carregado"""
@@ -81,24 +102,31 @@ class VeterinaryTranscription:
             dict: Resultado da transcrição
         """
         print(f"\nTranscrevendo: {audio_path.name}")
+        logging.info(f"Iniciando transcrição de áudio: {audio_path.name}")
 
         # Garantir que o Whisper está carregado
         self._ensure_whisper_loaded()
 
-        result = self.whisper_model.transcribe(
-            str(audio_path),
-            language=config.DEFAULT_LANGUAGE,
-            verbose=False
-        )
+        try:
+            result = self.whisper_model.transcribe(
+                str(audio_path),
+                language=config.DEFAULT_LANGUAGE,
+                verbose=False
+            )
 
-        # Salvar transcrição
-        transcription_file = config.TRANSCRIPTION_DIR / f"{audio_path.stem}_transcricao.txt"
-        with open(transcription_file, 'w', encoding='utf-8') as f:
-            f.write(result['text'])
+            # Salvar transcrição
+            transcription_file = config.TRANSCRIPTION_DIR / f"{audio_path.stem}_transcricao.txt"
+            with open(transcription_file, 'w', encoding='utf-8') as f:
+                f.write(result['text'])
 
-        print(f"OK - Transcrição salva: {transcription_file.name}")
+            print(f"OK - Transcrição salva: {transcription_file.name}")
+            logging.info(f"Transcrição concluída: {transcription_file.name}")
 
-        return result
+            return result
+
+        except Exception as e:
+            logging.error(f"Erro ao transcrever áudio {audio_path.name}: {e}")
+            raise
 
     def collect_patient_info(self):
         """
@@ -111,26 +139,38 @@ class VeterinaryTranscription:
         print("COLETA DE INFORMACOES DO PACIENTE")
         print("="*60)
 
-        info = {
-            'paciente_nome': input("Nome do paciente: ").strip(),
-            'paciente_especie': input("Espécie (Cão/Gato/Outro): ").strip(),
-            'paciente_raca': input("Raça: ").strip(),
-            'paciente_idade': input("Idade e Peso (ex: 3 anos, 8kg): ").strip(),
-            'tutor_nome': input("Nome do tutor: ").strip(),
-            'data_consulta': input("Data da consulta (DD/MM/AAAA) [Enter=hoje]: ").strip(),
-            'motivo_retorno': input("Motivo do retorno: ").strip(),
-            'tipo_atendimento': input("Tipo (Presencial/Videoconferência): ").strip()
-        }
+        while True:
+            info = {
+                'paciente_nome': input("Nome do paciente: ").strip(),
+                'paciente_especie': input("Espécie (Cão/Gato/Outro): ").strip(),
+                'paciente_raca': input("Raça: ").strip(),
+                'paciente_idade': input("Idade e Peso (ex: 3 anos, 8kg): ").strip(),
+                'tutor_nome': input("Nome do tutor: ").strip(),
+                'data_consulta': input("Data da consulta (DD/MM/AAAA) [Enter=hoje]: ").strip(),
+                'motivo_retorno': input("Motivo do retorno: ").strip(),
+                'tipo_atendimento': input("Tipo (Presencial/Videoconferência): ").strip()
+            }
 
-        # Data padrão = hoje
-        if not info['data_consulta']:
-            info['data_consulta'] = datetime.now().strftime("%d/%m/%Y")
+            # Data padrão = hoje
+            if not info['data_consulta']:
+                info['data_consulta'] = datetime.now().strftime("%d/%m/%Y")
 
-        return info
+            # Validar informações
+            try:
+                validate_patient_info(info)
+                logging.info("Informações do paciente coletadas e validadas")
+                return info
+            except ValueError as e:
+                print(f"\nERRO - {e}")
+                print("Por favor, preencha novamente.\n")
+                retry = input("Tentar novamente? (s/n): ").strip().lower()
+                if retry != 's':
+                    raise
 
+    @retry_with_backoff(max_retries=4, initial_delay=2.0, backoff_factor=2.0)
     def generate_report(self, transcription_text, patient_info):
         """
-        Gera relatório estruturado usando Claude API
+        Gera relatório estruturado usando Claude API (com retry automático)
 
         Args:
             transcription_text (str): Texto da transcrição
@@ -140,6 +180,7 @@ class VeterinaryTranscription:
             str: Relatório formatado
         """
         print("\nGerando relatorio com Claude API...")
+        logging.info("Iniciando geração de relatório via Claude API")
 
         # Montar prompt com dados do paciente
         prompt = self.prompt_template.format(
@@ -147,7 +188,7 @@ class VeterinaryTranscription:
             **patient_info
         )
 
-        # Chamar API Claude
+        # Chamar API Claude (retry automático via decorator)
         try:
             message = self.anthropic_client.messages.create(
                 model="claude-sonnet-4-20250514",
@@ -166,10 +207,20 @@ class VeterinaryTranscription:
             # Estatísticas de uso
             usage = message.usage
             print(f"Stats: Tokens usados: {usage.input_tokens} input, {usage.output_tokens} output")
+            logging.info(f"Relatório gerado com sucesso - Tokens: {usage.input_tokens} input, {usage.output_tokens} output")
 
             return report
 
+        except anthropic.RateLimitError as e:
+            logging.error(f"Limite de taxa excedido: {e}")
+            print(f"ERRO - Limite de taxa da API excedido. Aguarde alguns minutos.")
+            raise
+        except anthropic.APIError as e:
+            logging.error(f"Erro da API Claude: {e}")
+            print(f"ERRO - Erro da API Claude: {str(e)}")
+            raise
         except Exception as e:
+            logging.error(f"Erro inesperado ao gerar relatório: {e}")
             print(f"ERRO - Erro ao gerar relatório: {str(e)}")
             raise
 

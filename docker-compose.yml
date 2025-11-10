@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  # Serviço principal - Interface Web
+  vet-docs-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: veterinary-docs-web
+    ports:
+      - "8501:8501"
+    volumes:
+      # Persistir dados
+      - ./audios:/app/audios
+      - ./transcricoes:/app/transcricoes
+      - ./relatorios:/app/relatorios
+      - ./logs:/app/logs
+      # Configuração
+      - ./.env:/app/.env:ro
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - vet-network
+
+  # Serviço CLI (opcional - para processamento em lote)
+  vet-docs-cli:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: veterinary-docs-cli
+    command: python transcribe_consult.py
+    volumes:
+      - ./audios:/app/audios
+      - ./transcricoes:/app/transcricoes
+      - ./relatorios:/app/relatorios
+      - ./logs:/app/logs
+      - ./.env:/app/.env:ro
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+    stdin_open: true
+    tty: true
+    networks:
+      - vet-network
+    profiles:
+      - cli  # Executar apenas quando explicitamente solicitado
+
+networks:
+  vet-network:
+    driver: bridge
+
+volumes:
+  # Volumes nomeados para backup (opcional)
+  vet-audios:
+  vet-transcricoes:
+  vet-relatorios:
+  vet-logs:

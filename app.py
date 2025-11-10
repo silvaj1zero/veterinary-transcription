@@ -8,6 +8,7 @@ Powered by Streamlit
 import streamlit as st
 import os
 import sys
+import logging
 from pathlib import Path
 from datetime import datetime
 import pandas as pd
@@ -18,11 +19,28 @@ import json
 import re
 from fpdf import FPDF
 
-# Configurar caminho do FFmpeg
-os.environ['PATH'] = r'C:\Users\Zero\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-8.0-full_build\bin;' + os.environ['PATH']
-
 # Carregar variáveis de ambiente
 load_dotenv()
+
+# Configurar logging para Streamlit
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('veterinary_system_web.log', encoding='utf-8'),
+        logging.StreamHandler()
+    ]
+)
+
+# Configurar FFmpeg (cross-platform)
+from utils import setup_ffmpeg, validate_patient_info
+try:
+    setup_ffmpeg()
+    logging.info("FFmpeg configurado com sucesso")
+except EnvironmentError as e:
+    logging.error(f"Erro ao configurar FFmpeg: {e}")
+    st.error(f"⚠️ Erro ao configurar FFmpeg: {e}")
+    st.info("Por favor, instale o FFmpeg e tente novamente.")
 
 # Importar sistema
 import config
@@ -496,22 +514,28 @@ elif menu == "➕ Nova Consulta":
             submitted = st.form_submit_button("🚀 Gerar Relatório", use_container_width=True)
 
             if submitted:
-                # Validar campos
-                if not all([paciente_nome, paciente_especie, paciente_raca, paciente_idade, tutor_nome, motivo_retorno]):
-                    st.error("❌ Por favor, preencha todos os campos obrigatórios (*)")
-                else:
-                    # Preparar dados do paciente
-                    patient_info = {
-                        'paciente_nome': paciente_nome,
-                        'paciente_especie': paciente_especie,
-                        'paciente_raca': paciente_raca,
-                        'paciente_idade': paciente_idade,
-                        'tutor_nome': tutor_nome,
-                        'data_consulta': data_consulta.strftime("%d/%m/%Y"),
-                        'motivo_retorno': motivo_retorno,
-                        'tipo_atendimento': tipo_atendimento
-                    }
+                # Preparar dados do paciente
+                patient_info = {
+                    'paciente_nome': paciente_nome,
+                    'paciente_especie': paciente_especie,
+                    'paciente_raca': paciente_raca,
+                    'paciente_idade': paciente_idade,
+                    'tutor_nome': tutor_nome,
+                    'data_consulta': data_consulta.strftime("%d/%m/%Y"),
+                    'motivo_retorno': motivo_retorno,
+                    'tipo_atendimento': tipo_atendimento
+                }
 
+                # Validar campos usando a função de validação
+                try:
+                    validate_patient_info(patient_info)
+                    logging.info(f"Formulário validado para paciente: {paciente_nome}")
+                except ValueError as e:
+                    st.error(f"❌ {str(e)}")
+                    logging.warning(f"Validação falhou: {e}")
+                    patient_info = None
+
+                if patient_info:
                     # Processar
                     with st.spinner("🔄 Processando consulta..."):
                         try:
@@ -532,6 +556,7 @@ elif menu == "➕ Nova Consulta":
 
                             st.session_state['last_report'] = report_path
                             st.session_state['show_result'] = True
+                            logging.info(f"Relatório gerado com sucesso: {report_path.name}")
 
                             # Limpar dados temporários
                             if 'audio_path' in st.session_state:
@@ -542,6 +567,7 @@ elif menu == "➕ Nova Consulta":
                             st.rerun()
 
                         except Exception as e:
+                            logging.error(f"Erro ao processar consulta: {e}")
                             st.error(f"❌ Erro ao processar: {str(e)}")
 
     # Mostrar resultado
