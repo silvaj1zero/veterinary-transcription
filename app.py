@@ -203,11 +203,45 @@ def convert_md_to_pdf(md_content, output_filename):
         # Remover emojis
         text = re.sub(r'[\U0001F000-\U0001FFFF]+', '', text)
 
+        # Remover outros caracteres Unicode problemáticos (setas, símbolos especiais, etc)
+        text = re.sub(r'[\u2000-\u2FFF]+', '', text)  # Remove símbolos gerais e pontuação
+
+        # Normalizar caracteres acentuados para compatibilidade com latin-1
+        # Mapear caracteres problemáticos comuns
+        replacements = {
+            'á': 'a', 'à': 'a', 'â': 'a', 'ã': 'a', 'ä': 'a',
+            'é': 'e', 'è': 'e', 'ê': 'e', 'ë': 'e',
+            'í': 'i', 'ì': 'i', 'î': 'i', 'ï': 'i',
+            'ó': 'o', 'ò': 'o', 'ô': 'o', 'õ': 'o', 'ö': 'o',
+            'ú': 'u', 'ù': 'u', 'û': 'u', 'ü': 'u',
+            'ç': 'c', 'ñ': 'n',
+            'Á': 'A', 'À': 'A', 'Â': 'A', 'Ã': 'A', 'Ä': 'A',
+            'É': 'E', 'È': 'E', 'Ê': 'E', 'Ë': 'E',
+            'Í': 'I', 'Ì': 'I', 'Î': 'I', 'Ï': 'I',
+            'Ó': 'O', 'Ò': 'O', 'Ô': 'O', 'Õ': 'O', 'Ö': 'O',
+            'Ú': 'U', 'Ù': 'U', 'Û': 'U', 'Ü': 'U',
+            'Ç': 'C', 'Ñ': 'N',
+            '"': '"', '"': '"', ''': "'", ''': "'"
+        }
+        for old_char, new_char in replacements.items():
+            text = text.replace(old_char, new_char)
+
         # Pular se não tem texto após limpeza
         if not text.strip():
             continue
 
-        # Tentar adicionar o texto ao PDF
+        # Converter para latin-1 safe (remover qualquer caractere que não seja latin-1)
+        try:
+            # Tentar encode/decode para verificar se é latin-1 compatível
+            text = text.encode('latin-1', errors='ignore').decode('latin-1')
+        except:
+            # Se falhar, usar apenas ASCII
+            text = text.encode('ascii', 'ignore').decode('ascii')
+
+        if not text.strip():
+            continue
+
+        # Adicionar o texto ao PDF
         try:
             # Para linhas muito longas, quebrar em palavras
             if len(text) > 120:
@@ -226,16 +260,20 @@ def convert_md_to_pdf(md_content, output_filename):
             else:
                 pdf.multi_cell(0, 5, text, align='L')
         except Exception as e:
-            # Se falhar com caracteres especiais, tentar remover acentos
+            # Última tentativa: remover tudo que não é ASCII básico
             try:
                 text_ascii = text.encode('ascii', 'ignore').decode('ascii')
-                if text_ascii.strip():  # Só adicionar se ainda tem conteúdo
+                if text_ascii.strip():
                     pdf.multi_cell(0, 5, text_ascii, align='L')
             except:
                 pass  # Ignorar linha problemática
 
-    # Retornar bytes do PDF (converter bytearray para bytes)
-    return bytes(pdf.output())
+    # Retornar bytes do PDF usando dest='S' para retornar string
+    # Isso evita problemas de encoding no Windows
+    pdf_output = pdf.output(dest='S')
+    if isinstance(pdf_output, str):
+        return pdf_output.encode('latin-1')
+    return bytes(pdf_output)
 
 def get_recent_reports(limit=10):
     """Obtém relatórios recentes"""
@@ -845,7 +883,25 @@ elif menu == "⚙️ Configurações":
 
     with col2:
         if st.button("📁 Abrir Pasta de Relatórios"):
-            os.startfile(config.REPORT_DIR)
+            try:
+                # Converter Path para string e abrir pasta
+                folder_path = str(config.REPORT_DIR.resolve())
+
+                # Usar método apropriado para cada sistema operacional
+                if sys.platform == 'win32':
+                    os.startfile(folder_path)
+                elif sys.platform == 'darwin':  # macOS
+                    os.system(f'open "{folder_path}"')
+                else:  # Linux
+                    os.system(f'xdg-open "{folder_path}"')
+
+                st.success(f"Pasta aberta: {folder_path}")
+                logging.info(f"Pasta de relatórios aberta: {folder_path}")
+            except Exception as e:
+                st.error(f"Erro ao abrir pasta: {e}")
+                logging.error(f"Erro ao abrir pasta de relatórios: {e}")
+                # Mostrar caminho alternativo
+                st.info(f"Abra manualmente: {config.REPORT_DIR}")
 
     with col3:
         if st.button("📚 Ver Documentação"):
