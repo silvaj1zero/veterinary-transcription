@@ -41,3 +41,8 @@ cost_log.txt
 # Sistema
 .DS_Store
 Thumbs.db
+
+# Backups e arquivos temporários
+backup_*/
+*.ps1
+.claude/
