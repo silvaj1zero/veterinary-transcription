@@ -1,0 +1,8 @@
+# Force Railway to ignore these files
+# This prevents Railpack from being triggered
+# Railway will fall back to Dockerfile
+
+mise.toml
+nixpacks.toml
+.python-version
+runtime.txt
