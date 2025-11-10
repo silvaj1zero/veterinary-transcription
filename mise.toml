@@ -1,0 +1,6 @@
+# Railway Python version configuration
+# Force Python 3.11 for openai-whisper compatibility
+# (Whisper not compatible with Python 3.13)
+
+[tools]
+python = "3.11.9"
