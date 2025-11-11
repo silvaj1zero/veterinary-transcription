@@ -37,6 +37,9 @@ COPY . .
 # Criar diretórios necessários
 RUN mkdir -p audios transcricoes relatorios templates logs
 
+# Tornar entrypoint executável
+RUN chmod +x entrypoint.sh
+
 # Expor porta para Streamlit
 EXPOSE 8501
 
@@ -44,6 +47,5 @@ EXPOSE 8501
 # HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
 #     CMD curl -f http://localhost:8501/_stcore/health || exit 1
 
-# Comando padrão: interface web Streamlit
-# Use shell form to support environment variable substitution
-CMD streamlit run app.py --server.port=${PORT:-8501} --server.address=0.0.0.0 --server.headless=true
+# Usar entrypoint script para melhor controle de inicialização
+ENTRYPOINT ["./entrypoint.sh"]

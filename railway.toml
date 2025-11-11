@@ -3,7 +3,7 @@ builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
 
 [deploy]
-startCommand = "streamlit run app.py --server.port=$PORT --server.address=0.0.0.0 --server.headless=true"
+# startCommand removido - usando ENTRYPOINT do Dockerfile
 # Healthcheck desabilitado temporariamente para debug
 # healthcheckPath = "/_stcore/health"
 # healthcheckTimeout = 300
