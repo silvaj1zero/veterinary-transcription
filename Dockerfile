@@ -21,6 +21,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     ffmpeg \
     git \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Copiar arquivos de dependências
@@ -39,8 +40,8 @@ RUN mkdir -p audios transcricoes relatorios templates logs
 # Expor porta para Streamlit
 EXPOSE 8501
 
-# Healthcheck
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+# Healthcheck (aumentado para permitir inicialização do Whisper)
+HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
     CMD curl -f http://localhost:8501/_stcore/health || exit 1
 
 # Comando padrão: interface web Streamlit
