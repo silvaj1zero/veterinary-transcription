@@ -583,56 +583,37 @@ elif menu == "➕ Nova Consulta":
             # Exame Clínico (Opcional)
             st.markdown("---")
             st.subheader("🩺 Exame Físico Geral (Opcional)")
-
-            usar_exame_clinico = st.checkbox(
-                "✅ Usar dados de exame clínico (substituirá informações da transcrição)",
-                value=False,
-                help="Marque para que o relatório use EXATAMENTE os dados abaixo, ignorando a transcrição"
-            )
-
-            if usar_exame_clinico:
-                st.info("ℹ️ Dados preenchidos abaixo terão PRIORIDADE sobre a transcrição")
+            st.caption("💡 Preencha apenas os campos que deseja que apareçam no relatório. Campos vazios serão extraídos da transcrição.")
 
             col1, col2, col3 = st.columns(3)
             with col1:
-                exame_temperatura = st.text_input("Temperatura", placeholder="Ex: 38.5°C", disabled=not usar_exame_clinico)
-                exame_fc = st.text_input("Frequência Cardíaca", placeholder="Ex: 120 bpm", disabled=not usar_exame_clinico)
-                exame_fr = st.text_input("Frequência Respiratória", placeholder="Ex: 30 mpm", disabled=not usar_exame_clinico)
+                exame_temperatura = st.text_input("Temperatura", placeholder="Ex: 38.5°C", key="temp")
+                exame_fc = st.text_input("Frequência Cardíaca", placeholder="Ex: 120 bpm", key="fc")
+                exame_fr = st.text_input("Frequência Respiratória", placeholder="Ex: 30 mpm", key="fr")
             with col2:
-                exame_tpc = st.text_input("TPC", placeholder="Ex: < 2s", disabled=not usar_exame_clinico)
-                exame_mucosas = st.text_input("Mucosas", placeholder="Ex: Rosadas", disabled=not usar_exame_clinico)
-                exame_hidratacao = st.text_input("Hidratação", placeholder="Ex: Normal", disabled=not usar_exame_clinico)
+                exame_tpc = st.text_input("TPC", placeholder="Ex: < 2s", key="tpc")
+                exame_mucosas = st.text_input("Mucosas", placeholder="Ex: Rosadas", key="mucosas")
+                exame_hidratacao = st.text_input("Hidratação", placeholder="Ex: Normal", key="hidrat")
             with col3:
-                exame_linfonodos = st.text_area("Linfonodos", placeholder="Ex: Sem alterações", height=100, disabled=not usar_exame_clinico)
+                exame_linfonodos = st.text_area("Linfonodos", placeholder="Ex: Sem alterações", height=100, key="linf")
 
             # Medicação e Exames (Opcional)
             st.markdown("---")
             st.subheader("💊 Medicação e Exames (Opcional)")
-
-            usar_medicacao = st.checkbox(
-                "✅ Usar prescrição médica informada (substituirá informações da transcrição)",
-                value=False,
-                help="Marque para que o relatório use EXATAMENTE a medicação abaixo"
-            )
+            st.caption("💡 Preencha se quiser adicionar/substituir medicação ou exames. Campos vazios serão extraídos da transcrição.")
 
             medicacao_info = st.text_area(
                 "Medicação Prescrita",
                 placeholder="Ex:\n- Omeprazol 20mg, 1x ao dia, 7 dias\n- Probiótico, 1 sachê 2x ao dia",
                 height=100,
-                disabled=not usar_medicacao
-            )
-
-            usar_exames = st.checkbox(
-                "✅ Usar resultados de exames informados (adicionará ao relatório)",
-                value=False,
-                help="Marque para incluir os resultados de exames abaixo no relatório"
+                key="med"
             )
 
             exames_complementares = st.text_area(
                 "Resultados de Exames",
                 placeholder="Ex:\n- Hemograma: dentro da normalidade\n- Ultrassom: sem alterações",
                 height=100,
-                disabled=not usar_exames
+                key="exames"
             )
 
             st.markdown("---")
@@ -659,6 +640,7 @@ elif menu == "➕ Nova Consulta":
 
             if submitted:
                 # Preparar dados do paciente
+                # LÓGICA SIMPLES: Se campo preenchido → usa, se vazio → extrai da transcrição
                 patient_info = {
                     'paciente_nome': paciente_nome,
                     'paciente_especie': paciente_especie,
@@ -668,25 +650,19 @@ elif menu == "➕ Nova Consulta":
                     'data_consulta': data_consulta.strftime("%d/%m/%Y"),
                     'motivo_retorno': motivo_retorno,
                     'tipo_atendimento': tipo_atendimento,
-                    # Campos opcionais do veterinário (sempre incluir se preenchidos)
-                    'vet_nome': vet_nome if vet_nome else '',
-                    'vet_crmv': vet_crmv if vet_crmv else '',
-                    'vet_especialidade': vet_especialidade if vet_especialidade else '',
-                    # Campos opcionais de exame clínico (SOMENTE se checkbox marcado)
-                    'exame_temperatura': exame_temperatura if (usar_exame_clinico and exame_temperatura) else '',
-                    'exame_fc': exame_fc if (usar_exame_clinico and exame_fc) else '',
-                    'exame_fr': exame_fr if (usar_exame_clinico and exame_fr) else '',
-                    'exame_tpc': exame_tpc if (usar_exame_clinico and exame_tpc) else '',
-                    'exame_mucosas': exame_mucosas if (usar_exame_clinico and exame_mucosas) else '',
-                    'exame_hidratacao': exame_hidratacao if (usar_exame_clinico and exame_hidratacao) else '',
-                    'exame_linfonodos': exame_linfonodos if (usar_exame_clinico and exame_linfonodos) else '',
-                    # Campos opcionais de medicação e exames (SOMENTE se checkbox marcado)
-                    'medicacao_info': medicacao_info if (usar_medicacao and medicacao_info) else '',
-                    'exames_complementares': exames_complementares if (usar_exames and exames_complementares) else '',
-                    # Flags para indicar uso de dados opcionais
-                    'usar_exame_clinico': usar_exame_clinico,
-                    'usar_medicacao': usar_medicacao,
-                    'usar_exames': usar_exames
+                    # Campos opcionais: se preenchido, usa; se vazio, ignora (Claude extrai da transcrição)
+                    'vet_nome': vet_nome.strip() if vet_nome else '',
+                    'vet_crmv': vet_crmv.strip() if vet_crmv else '',
+                    'vet_especialidade': vet_especialidade.strip() if vet_especialidade else '',
+                    'exame_temperatura': exame_temperatura.strip() if exame_temperatura else '',
+                    'exame_fc': exame_fc.strip() if exame_fc else '',
+                    'exame_fr': exame_fr.strip() if exame_fr else '',
+                    'exame_tpc': exame_tpc.strip() if exame_tpc else '',
+                    'exame_mucosas': exame_mucosas.strip() if exame_mucosas else '',
+                    'exame_hidratacao': exame_hidratacao.strip() if exame_hidratacao else '',
+                    'exame_linfonodos': exame_linfonodos.strip() if exame_linfonodos else '',
+                    'medicacao_info': medicacao_info.strip() if medicacao_info else '',
+                    'exames_complementares': exames_complementares.strip() if exames_complementares else ''
                 }
 
                 # Validar campos usando a função de validação
