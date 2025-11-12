@@ -14,6 +14,29 @@ Você é um assistente especializado em documentação de consultas médicas vet
 - Motivo do retorno: {motivo_retorno}
 - Tipo de atendimento: {tipo_atendimento}
 
+**DADOS DO VETERINÁRIO (se fornecidos):**
+- Nome: {vet_nome}
+- CRMV: {vet_crmv}
+- Especialidade: {vet_especialidade}
+
+**DADOS DE EXAME CLÍNICO FORNECIDOS:**
+⚠️ ATENÇÃO: Se estes campos estiverem preenchidos, USE EXATAMENTE ESTES VALORES no relatório. NÃO extraia da transcrição.
+- Temperatura: {exame_temperatura}
+- Frequência Cardíaca: {exame_fc}
+- Frequência Respiratória: {exame_fr}
+- TPC: {exame_tpc}
+- Mucosas: {exame_mucosas}
+- Hidratação: {exame_hidratacao}
+- Linfonodos: {exame_linfonodos}
+
+**MEDICAÇÃO PRESCRITA FORNECIDA:**
+⚠️ ATENÇÃO: Se este campo estiver preenchido, USE EXATAMENTE ESTA PRESCRIÇÃO no relatório. NÃO extraia da transcrição.
+{medicacao_info}
+
+**EXAMES COMPLEMENTARES FORNECIDOS:**
+⚠️ ATENÇÃO: Se este campo estiver preenchido, INCLUA ESTES RESULTADOS no relatório.
+{exames_complementares}
+
 **TRANSCRIÇÃO DA CONSULTA:**
 {transcricao}
 
@@ -28,7 +51,8 @@ Com base na transcrição acima, gere um relatório veterinário profissional se
 ## 📋 DADOS DO ATENDIMENTO
 - **Data:** {data_consulta}
 - **Modalidade:** {tipo_atendimento}
-- **Veterinário:** [extrair do contexto se mencionado]
+- **Veterinário:** {vet_nome} | **CRMV:** {vet_crmv} | **Especialidade:** {vet_especialidade}
+  [Se dados do veterinário NÃO foram fornecidos, usar: "não informado"]
 
 ## 🐾 IDENTIFICAÇÃO DO PACIENTE
 - **Paciente:** {paciente_nome} | **Espécie:** {paciente_especie} | **Raça:** {paciente_raca}
@@ -52,13 +76,19 @@ Com base na transcrição acima, gere um relatório veterinário profissional se
 
 ## 🏥 EXAME CLÍNICO
 **Exame Físico Geral:**
-- Temperatura: [X°C ou "não aferida"]
-- Frequência Cardíaca: [X bpm ou "não mencionada"]
-- Frequência Respiratória: [X mpm ou "não mencionada"]
-- TPC: [X seg ou "não mencionado"]
-- Mucosas: [característica]
-- Hidratação: [X%]
-- Linfonodos: [normal/alterado]
+
+⚠️ REGRA CRÍTICA DE PRIORIZAÇÃO:
+1. SE o campo acima estiver preenchido (não vazio) → USE EXATAMENTE O VALOR FORNECIDO
+2. SE o campo acima estiver vazio → Extraia da transcrição se mencionado
+3. SE não mencionado na transcrição → Use "não aferida/mencionada/mencionado"
+
+- Temperatura: {exame_temperatura}
+- Frequência Cardíaca: {exame_fc}
+- Frequência Respiratória: {exame_fr}
+- TPC: {exame_tpc}
+- Mucosas: {exame_mucosas}
+- Hidratação: {exame_hidratacao}
+- Linfonodos: {exame_linfonodos}
 
 **Achados Específicos:**
 - [Listar achados relevantes por sistema]
@@ -76,9 +106,14 @@ Com base na transcrição acima, gere um relatório veterinário profissional se
 
 ## 💊 PRESCRIÇÃO MÉDICA
 
+⚠️ REGRA CRÍTICA: Se medicação foi fornecida abaixo, USE EXATAMENTE ESTA PRESCRIÇÃO. NÃO extraia da transcrição.
+
+**Medicações prescritas fornecidas:**
+{medicacao_info}
+
 | Medicamento | Princípio Ativo | Dosagem | Via | Frequência | Duração | Observações |
 |-------------|-----------------|---------|-----|------------|---------|-------------|
-| [Extrair da transcrição] | | | | | | |
+| [SE medicação fornecida acima: formatar em tabela. SENÃO: extrair da transcrição] | | | | | | |
 
 **Se não houver prescrições:** "Sem novas prescrições - manter tratamento anterior"
 
@@ -99,8 +134,12 @@ Com base na transcrição acima, gere um relatório veterinário profissional se
 
 ## 📊 EXAMES COMPLEMENTARES
 
+**Resultados de Exames Fornecidos:**
+{exames_complementares}
+[Se resultados foram fornecidos acima, incluir no relatório. Se vazio, extrair da transcrição]
+
 **Exames Solicitados:**
-- [Listar com prazos]
+- [Listar com prazos se mencionados]
 
 ## 🔄 PLANO DE ACOMPANHAMENTO
 

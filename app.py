@@ -568,8 +568,94 @@ elif menu == "➕ Nova Consulta":
                 motivo_retorno = st.text_input("Motivo do Retorno/Consulta *", placeholder="Ex: Acompanhamento dermatite")
                 tipo_atendimento = st.selectbox("Tipo de Atendimento", ["Presencial", "Videoconferência"])
 
-            st.markdown("")
-            submitted = st.form_submit_button("🚀 Gerar Relatório", width='stretch')
+            # Dados do Veterinário (Opcionais)
+            st.markdown("---")
+            st.subheader("👨‍⚕️ Dados do Veterinário (Opcional)")
+
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                vet_nome = st.text_input("Nome Completo do Veterinário", placeholder="Ex: Dr. João Silva")
+            with col2:
+                vet_crmv = st.text_input("CRMV", placeholder="Ex: CRMV-SP 12345")
+            with col3:
+                vet_especialidade = st.text_input("Especialidade", placeholder="Ex: Dermatologia")
+
+            # Exame Clínico (Opcional)
+            st.markdown("---")
+            st.subheader("🩺 Exame Físico Geral (Opcional)")
+
+            usar_exame_clinico = st.checkbox(
+                "✅ Usar dados de exame clínico (substituirá informações da transcrição)",
+                value=False,
+                help="Marque para que o relatório use EXATAMENTE os dados abaixo, ignorando a transcrição"
+            )
+
+            if usar_exame_clinico:
+                st.info("ℹ️ Dados preenchidos abaixo terão PRIORIDADE sobre a transcrição")
+
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                exame_temperatura = st.text_input("Temperatura", placeholder="Ex: 38.5°C", disabled=not usar_exame_clinico)
+                exame_fc = st.text_input("Frequência Cardíaca", placeholder="Ex: 120 bpm", disabled=not usar_exame_clinico)
+                exame_fr = st.text_input("Frequência Respiratória", placeholder="Ex: 30 mpm", disabled=not usar_exame_clinico)
+            with col2:
+                exame_tpc = st.text_input("TPC", placeholder="Ex: < 2s", disabled=not usar_exame_clinico)
+                exame_mucosas = st.text_input("Mucosas", placeholder="Ex: Rosadas", disabled=not usar_exame_clinico)
+                exame_hidratacao = st.text_input("Hidratação", placeholder="Ex: Normal", disabled=not usar_exame_clinico)
+            with col3:
+                exame_linfonodos = st.text_area("Linfonodos", placeholder="Ex: Sem alterações", height=100, disabled=not usar_exame_clinico)
+
+            # Medicação e Exames (Opcional)
+            st.markdown("---")
+            st.subheader("💊 Medicação e Exames (Opcional)")
+
+            usar_medicacao = st.checkbox(
+                "✅ Usar prescrição médica informada (substituirá informações da transcrição)",
+                value=False,
+                help="Marque para que o relatório use EXATAMENTE a medicação abaixo"
+            )
+
+            medicacao_info = st.text_area(
+                "Medicação Prescrita",
+                placeholder="Ex:\n- Omeprazol 20mg, 1x ao dia, 7 dias\n- Probiótico, 1 sachê 2x ao dia",
+                height=100,
+                disabled=not usar_medicacao
+            )
+
+            usar_exames = st.checkbox(
+                "✅ Usar resultados de exames informados (adicionará ao relatório)",
+                value=False,
+                help="Marque para incluir os resultados de exames abaixo no relatório"
+            )
+
+            exames_complementares = st.text_area(
+                "Resultados de Exames",
+                placeholder="Ex:\n- Hemograma: dentro da normalidade\n- Ultrassom: sem alterações",
+                height=100,
+                disabled=not usar_exames
+            )
+
+            st.markdown("---")
+
+            # Botões de ação
+            col_btn1, col_btn2, col_btn3 = st.columns([1, 1, 1])
+
+            with col_btn1:
+                limpar = st.form_submit_button("🗑️ Limpar Formulário", type="secondary", use_container_width=True)
+
+            with col_btn2:
+                submitted = st.form_submit_button("🚀 Gerar Relatório", type="primary", use_container_width=True)
+
+            with col_btn3:
+                pass  # Espaço para futuro botão
+
+            if limpar:
+                # Limpar session state
+                keys_to_clear = ['audio_path', 'transcription', 'processing_mode', 'show_result', 'last_report']
+                for key in keys_to_clear:
+                    if key in st.session_state:
+                        del st.session_state[key]
+                st.rerun()
 
             if submitted:
                 # Preparar dados do paciente
@@ -581,7 +667,26 @@ elif menu == "➕ Nova Consulta":
                     'tutor_nome': tutor_nome,
                     'data_consulta': data_consulta.strftime("%d/%m/%Y"),
                     'motivo_retorno': motivo_retorno,
-                    'tipo_atendimento': tipo_atendimento
+                    'tipo_atendimento': tipo_atendimento,
+                    # Campos opcionais do veterinário (sempre incluir se preenchidos)
+                    'vet_nome': vet_nome if vet_nome else '',
+                    'vet_crmv': vet_crmv if vet_crmv else '',
+                    'vet_especialidade': vet_especialidade if vet_especialidade else '',
+                    # Campos opcionais de exame clínico (SOMENTE se checkbox marcado)
+                    'exame_temperatura': exame_temperatura if (usar_exame_clinico and exame_temperatura) else '',
+                    'exame_fc': exame_fc if (usar_exame_clinico and exame_fc) else '',
+                    'exame_fr': exame_fr if (usar_exame_clinico and exame_fr) else '',
+                    'exame_tpc': exame_tpc if (usar_exame_clinico and exame_tpc) else '',
+                    'exame_mucosas': exame_mucosas if (usar_exame_clinico and exame_mucosas) else '',
+                    'exame_hidratacao': exame_hidratacao if (usar_exame_clinico and exame_hidratacao) else '',
+                    'exame_linfonodos': exame_linfonodos if (usar_exame_clinico and exame_linfonodos) else '',
+                    # Campos opcionais de medicação e exames (SOMENTE se checkbox marcado)
+                    'medicacao_info': medicacao_info if (usar_medicacao and medicacao_info) else '',
+                    'exames_complementares': exames_complementares if (usar_exames and exames_complementares) else '',
+                    # Flags para indicar uso de dados opcionais
+                    'usar_exame_clinico': usar_exame_clinico,
+                    'usar_medicacao': usar_medicacao,
+                    'usar_exames': usar_exames
                 }
 
                 # Validar campos usando a função de validação
@@ -703,99 +808,159 @@ elif menu == "➕ Nova Consulta":
 elif menu == "📋 Histórico":
     st.markdown('<p class="main-header">📋 Histórico de Consultas</p>', unsafe_allow_html=True)
 
-    # Filtros
-    col1, col2, col3 = st.columns(3)
+    # Modo de edição
+    if st.session_state.get('edit_mode') and st.session_state.get('editing_report'):
+        editing_report = st.session_state['editing_report']
 
-    with col1:
-        search_term = st.text_input("🔍 Buscar", placeholder="Nome do paciente...")
+        st.info(f"✏️ Editando relatório: **{editing_report['paciente']}**")
 
-    with col2:
-        filter_date = st.date_input("📅 Filtrar por data", value=None)
+        # Ler conteúdo do relatório
+        with open(editing_report['caminho'], 'r', encoding='utf-8') as f:
+            current_content = f.read()
 
-    with col3:
-        sort_by = st.selectbox("🔄 Ordenar por", ["Mais recentes", "Mais antigos", "Nome (A-Z)"])
+        # Editor de texto
+        edited_content = st.text_area(
+            "Edite o conteúdo do relatório:",
+            value=current_content,
+            height=500,
+            help="Você pode editar o relatório diretamente aqui. Use Markdown para formatação."
+        )
 
-    st.markdown("---")
+        col_cancel, col_save = st.columns(2)
 
-    # Obter relatórios
-    recent = get_recent_reports(100)  # Todos
+        with col_cancel:
+            if st.button("❌ Cancelar", use_container_width=True):
+                del st.session_state['edit_mode']
+                del st.session_state['editing_report']
+                st.rerun()
 
-    # Aplicar filtros
-    if search_term:
-        recent = [r for r in recent if search_term.lower() in r['paciente'].lower()]
+        with col_save:
+            if st.button("💾 Salvar Alterações", type="primary", use_container_width=True):
+                # Salvar alterações
+                try:
+                    with open(editing_report['caminho'], 'w', encoding='utf-8') as f:
+                        f.write(edited_content)
+                    st.success(f"✅ Relatório atualizado com sucesso!")
+                    logging.info(f"Relatório editado: {editing_report['arquivo']}")
+                    del st.session_state['edit_mode']
+                    del st.session_state['editing_report']
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"❌ Erro ao salvar: {str(e)}")
+                    logging.error(f"Erro ao salvar edição: {e}")
 
-    if filter_date:
-        date_str = filter_date.strftime("%d/%m/%Y")
-        recent = [r for r in recent if date_str in r['data']]
+        st.markdown("---")
+        st.subheader("📖 Preview do Relatório Editado")
+        st.markdown(edited_content)
 
-    # Aplicar ordenação
-    if sort_by == "Mais antigos":
-        recent = list(reversed(recent))
-    elif sort_by == "Nome (A-Z)":
-        recent = sorted(recent, key=lambda x: x['paciente'])
-
-    # Exibir resultados
-    st.write(f"**Total: {len(recent)} consulta(s)**")
-
-    if recent:
-        for idx, report in enumerate(recent):
-            with st.expander(f"🐾 {report['paciente']} - {report['data']} - {report['motivo']}"):
-                col1, col2 = st.columns([3, 1])
-
-                with col1:
-                    st.write(f"**Data:** {report['data']}")
-                    st.write(f"**Paciente:** {report['paciente']}")
-                    st.write(f"**Motivo:** {report['motivo']}")
-                    st.write(f"**Arquivo:** {report['arquivo']}")
-
-                with col2:
-                    # Botão de visualizar
-                    if st.button("👁️ Visualizar", key=f"view_hist_{idx}"):
-                        with open(report['caminho'], 'r', encoding='utf-8') as f:
-                            st.markdown(f.read())
-
-                    # Botões de download em múltiplos formatos
-                    st.write("**⬇️ Baixar:**")
-                    col_md_h, col_txt_h, col_pdf_h = st.columns(3)
-
-                    with open(report['caminho'], 'r', encoding='utf-8') as f:
-                        md_content_h = f.read()
-
-                    with col_md_h:
-                        st.download_button(
-                            label="MD",
-                            data=md_content_h,
-                            file_name=report['arquivo'],
-                            mime="text/markdown",
-                            key=f"download_md_hist_{idx}",
-                            width='stretch'
-                        )
-
-                    with col_txt_h:
-                        txt_content_h = convert_md_to_txt(md_content_h)
-                        txt_filename_h = Path(report['arquivo']).stem + '.txt'
-                        st.download_button(
-                            label="TXT",
-                            data=txt_content_h,
-                            file_name=txt_filename_h,
-                            mime="text/plain",
-                            key=f"download_txt_hist_{idx}",
-                            width='stretch'
-                        )
-
-                    with col_pdf_h:
-                        pdf_filename_h = Path(report['arquivo']).stem + '.pdf'
-                        pdf_bytes_h = convert_md_to_pdf(md_content_h, pdf_filename_h)
-                        st.download_button(
-                            label="PDF",
-                            data=pdf_bytes_h,
-                            file_name=pdf_filename_h,
-                            mime="application/pdf",
-                            key=f"download_pdf_hist_{idx}",
-                            width='stretch'
-                        )
     else:
-        st.info("Nenhuma consulta encontrada com os filtros aplicados.")
+        # Modo de visualização normal
+        # Filtros
+        col1, col2, col3 = st.columns(3)
+
+        with col1:
+            search_term = st.text_input("🔍 Buscar", placeholder="Nome do paciente...")
+
+        with col2:
+            filter_date = st.date_input("📅 Filtrar por data", value=None)
+
+        with col3:
+            sort_by = st.selectbox("🔄 Ordenar por", ["Mais recentes", "Mais antigos", "Nome (A-Z)"])
+
+        st.markdown("---")
+
+        # Obter relatórios
+        recent = get_recent_reports(100)  # Todos
+
+        # Aplicar filtros
+        if search_term:
+            recent = [r for r in recent if search_term.lower() in r['paciente'].lower()]
+
+        if filter_date:
+            date_str = filter_date.strftime("%d/%m/%Y")
+            recent = [r for r in recent if date_str in r['data']]
+
+        # Aplicar ordenação
+        if sort_by == "Mais antigos":
+            recent = list(reversed(recent))
+        elif sort_by == "Nome (A-Z)":
+            recent = sorted(recent, key=lambda x: x['paciente'])
+
+        # Exibir resultados
+        st.write(f"**Total: {len(recent)} consulta(s)**")
+
+        if recent:
+            for idx, report in enumerate(recent):
+                with st.expander(f"🐾 {report['paciente']} - {report['data']} - {report['motivo']}"):
+                    col1, col2 = st.columns([3, 1])
+
+                    with col1:
+                        st.write(f"**Data:** {report['data']}")
+                        st.write(f"**Paciente:** {report['paciente']}")
+                        st.write(f"**Motivo:** {report['motivo']}")
+                        st.write(f"**Arquivo:** {report['arquivo']}")
+
+                    with col2:
+                        # Botão de visualizar
+                        if st.button("👁️ Visualizar", key=f"view_hist_{idx}", use_container_width=True):
+                            with open(report['caminho'], 'r', encoding='utf-8') as f:
+                                st.markdown(f.read())
+
+                        # Botão de editar
+                        if st.button("✏️ Editar", key=f"edit_hist_{idx}", use_container_width=True):
+                            # Salvar relatório para edição no session_state
+                            st.session_state['editing_report'] = {
+                                'caminho': report['caminho'],
+                                'paciente': report['paciente'],
+                                'arquivo': report['arquivo']
+                            }
+                            st.session_state['edit_mode'] = True
+                            st.rerun()
+
+                        st.markdown("---")
+
+                        # Botões de download em múltiplos formatos
+                        st.write("**⬇️ Baixar:**")
+                        col_md_h, col_txt_h, col_pdf_h = st.columns(3)
+
+                        with open(report['caminho'], 'r', encoding='utf-8') as f:
+                            md_content_h = f.read()
+
+                        with col_md_h:
+                            st.download_button(
+                                label="MD",
+                                data=md_content_h,
+                                file_name=report['arquivo'],
+                                mime="text/markdown",
+                                key=f"download_md_hist_{idx}",
+                                use_container_width=True
+                            )
+
+                        with col_txt_h:
+                            txt_content_h = convert_md_to_txt(md_content_h)
+                            txt_filename_h = Path(report['arquivo']).stem + '.txt'
+                            st.download_button(
+                                label="TXT",
+                                data=txt_content_h,
+                                file_name=txt_filename_h,
+                                mime="text/plain",
+                                key=f"download_txt_hist_{idx}",
+                                use_container_width=True
+                            )
+
+                        with col_pdf_h:
+                            pdf_filename_h = Path(report['arquivo']).stem + '.pdf'
+                            pdf_bytes_h = convert_md_to_pdf(md_content_h, pdf_filename_h)
+                            st.download_button(
+                                label="PDF",
+                                data=pdf_bytes_h,
+                                file_name=pdf_filename_h,
+                                mime="application/pdf",
+                                key=f"download_pdf_hist_{idx}",
+                                use_container_width=True
+                            )
+        else:
+            st.info("Nenhuma consulta encontrada com os filtros aplicados.")
 
 elif menu == "⚙️ Configurações":
     st.markdown('<p class="main-header">⚙️ Configurações do Sistema</p>', unsafe_allow_html=True)
