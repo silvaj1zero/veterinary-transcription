@@ -16,8 +16,9 @@ for directory in [AUDIO_DIR, TRANSCRIPTION_DIR, REPORT_DIR, TEMPLATE_DIR]:
     directory.mkdir(exist_ok=True)
 
 # Modelo Whisper (opções: tiny, base, small, medium, large)
-# medium = melhor custo-benefício para português
-WHISPER_MODEL = "medium"
+# base = rápido e preciso para produção (5-10x mais rápido que medium)
+# medium = mais preciso mas MUITO mais lento em CPU (use apenas com GPU)
+WHISPER_MODEL = os.getenv("WHISPER_MODEL", "base")  # Permite override via env var
 
 # API Keys (será carregada do arquivo .env)
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")

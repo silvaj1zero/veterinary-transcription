@@ -807,10 +807,10 @@ elif menu == "⚙️ Configurações":
 
     model_options = {
         "tiny": "Tiny - Mais rápido, menos preciso (39 MB)",
-        "base": "Base - Balanceado (74 MB)",
+        "base": "Base - Rápido e preciso para produção (74 MB) ⭐",
         "small": "Small - Boa precisão (244 MB)",
-        "medium": "Medium - Melhor para português (769 MB) ⭐",
-        "large": "Large - Máxima precisão (1550 MB)"
+        "medium": "Medium - Mais preciso, lento em CPU (769 MB)",
+        "large": "Large - Máxima precisão, muito lento (1550 MB)"
     }
 
     selected_model = st.selectbox(

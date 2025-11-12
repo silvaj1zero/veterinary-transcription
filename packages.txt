@@ -1,0 +1,5 @@
+# System packages for Streamlit Cloud
+# NOTA: FFmpeg NÃO está disponível no Streamlit Cloud
+# Por isso Whisper não funciona
+
+# Nenhum pacote adicional necessário para a versão sem Whisper

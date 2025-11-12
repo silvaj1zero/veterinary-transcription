@@ -1,0 +1,18 @@
+# Requirements otimizado para Streamlit Cloud
+# ATENÇÃO: Whisper NÃO funciona no Streamlit Cloud!
+# Use apenas a funcionalidade de transcrição manual
+
+# Core API
+anthropic==0.39.0
+python-dotenv==1.0.0
+
+# Web interface
+streamlit==1.51.0
+pandas==2.2.0
+plotly==5.24.1
+
+# PDF generation
+fpdf2==2.8.1
+
+# Utilities
+tqdm==4.66.1

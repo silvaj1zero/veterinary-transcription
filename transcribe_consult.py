@@ -108,10 +108,15 @@ class VeterinaryTranscription:
         self._ensure_whisper_loaded()
 
         try:
+            # Otimizações para processamento em CPU (Railway/produção)
             result = self.whisper_model.transcribe(
                 str(audio_path),
                 language=config.DEFAULT_LANGUAGE,
-                verbose=False
+                verbose=False,
+                fp16=False,  # Desabilitar FP16 (não suportado em CPU)
+                beam_size=1,  # Reduzir beam search para acelerar (5 é default)
+                best_of=1,    # Reduzir número de candidatos (5 é default)
+                temperature=0.0  # Determinístico e mais rápido
             )
 
             # Salvar transcrição
