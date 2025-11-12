@@ -300,7 +300,7 @@ Opções gratuitas:
 
 ## 🎯 Próximas Melhorias
 
-Já incluídas na v1.1:
+Já incluídas na v1.3:
 - ✅ Interface gráfica completa
 - ✅ Dashboard com estatísticas
 - ✅ Upload de áudio
@@ -310,7 +310,7 @@ Já incluídas na v1.1:
 - ✅ Download de arquivos
 - ✅ Gráficos interativos
 
-Planejadas para v1.2:
+Planejadas para futuras versões:
 - [ ] Autenticação de usuários
 - [ ] Exportar para PDF
 - [ ] Editar relatórios gerados
@@ -369,5 +369,5 @@ Planejadas para v1.2:
 
 ---
 
-**Versão:** 1.1 (Interface Streamlit)
+**Versão:** 1.3 (Production Ready)
 **Última atualização:** Novembro 2025

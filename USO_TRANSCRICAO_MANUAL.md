@@ -296,5 +296,5 @@ Relatório gerado!
 
 ---
 
-**Versão:** 1.1
+**Versão:** 1.3 (Production Ready)
 **Atualizado:** Novembro 2025

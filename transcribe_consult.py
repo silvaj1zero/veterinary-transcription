@@ -2,7 +2,7 @@
 """
 Sistema de Transcrição e Documentação de Consultas Veterinárias
 Autor: BadiLab
-Versão: 1.0
+Versão: 1.3
 """
 
 import whisper

@@ -29,7 +29,7 @@ def teste_transcricao_existente():
     Teste da funcionalidade de transcrição existente
     """
     print("="*70)
-    print("TESTE RAPIDO DO SYSTEM - v1.1")
+    print("TESTE RAPIDO DO SYSTEM - v1.3")
     print("="*70)
     print("\nTestando funcionalidade: Processar transcricao existente\n")
 

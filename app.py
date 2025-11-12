@@ -291,7 +291,7 @@ with st.sidebar:
     st.metric("Custo Hoje", f"${stats['custo_hoje']:.2f}")
 
     st.markdown("---")
-    st.caption("v1.1 - Interface Streamlit")
+    st.caption("v1.3 - Production Ready")
 
 # Conteúdo principal
 if menu == "📊 Dashboard":
@@ -767,7 +767,7 @@ elif menu == "⚙️ Configurações":
     st.markdown("""
     **Sistema de Documentação de Consultas Veterinárias**
 
-    - **Versão:** 1.1 (Interface Streamlit)
+    - **Versão:** 1.3 (Production Ready)
     - **Desenvolvido por:** BadiLab
     - **Data:** Novembro 2025
 
@@ -810,4 +810,4 @@ elif menu == "⚙️ Configurações":
 
 # Footer
 st.markdown("---")
-st.caption("🏥 Sistema de Documentação Veterinária v1.1 | Desenvolvido por BadiLab | Powered by Streamlit, Whisper AI & Claude API")
+st.caption("🏥 Sistema de Documentação Veterinária v1.3 | Desenvolvido por BadiLab | Powered by Streamlit, Whisper AI & Claude API")

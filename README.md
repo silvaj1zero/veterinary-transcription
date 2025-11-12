@@ -360,5 +360,5 @@ Desenvolvido por **BadiLab - 2025**
 
 ---
 
-**Versão:** 1.0
+**Versão:** 1.3 (Production Ready)
 **Última atualização:** Novembro 2025

@@ -153,4 +153,4 @@ Leia o **README.md** para documentação completa.
 
 ---
 
-**Versão Rápida:** 1.0
+**Versão Rápida:** 1.3
