@@ -190,4 +190,4 @@ Total de relatórios na pasta: 4
 
 **Testado por:** Claude Code
 **Data:** 10/11/2025 03:30
-**Versão:** 1.2 (Production Ready)
+**Versão:** 1.3 (Production Ready)

@@ -1,8 +1,8 @@
 # 🔧 Documentação Técnica
 
-## Sistema de Documentação de Consultas Veterinárias v1.2
+## Sistema de Documentação de Consultas Veterinárias v1.3
 
-**Versão:** 1.2 (Production Ready)
+**Versão:** 1.3 (Production Ready)
 **Data:** Novembro 2025
 **Desenvolvedor:** BadiLab
 
@@ -1066,7 +1066,7 @@ find . -name "*.log" -mtime +7 -exec gzip {} \;
 ## 📞 Suporte Técnico
 
 **Desenvolvedor:** BadiLab
-**Versão:** 1.2 (Production Ready)
+**Versão:** 1.3 (Production Ready)
 **Repositório:** https://github.com/silvaj1zero/veterinary-transcription
 
 **Logs de Debug:**

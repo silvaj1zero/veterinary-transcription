@@ -1,6 +1,6 @@
 # 📖 Manual Rápido do Usuário
 
-## Sistema de Documentação de Consultas Veterinárias v1.2
+## Sistema de Documentação de Consultas Veterinárias v1.3
 
 **Desenvolvido por:** BadiLab
 **Última atualização:** Novembro 2025
