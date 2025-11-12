@@ -20,7 +20,10 @@ Você é um assistente especializado em documentação de consultas médicas vet
 - Especialidade: {vet_especialidade}
 
 **DADOS DE EXAME CLÍNICO FORNECIDOS:**
-⚠️ ATENÇÃO: Se estes campos estiverem preenchidos, USE EXATAMENTE ESTES VALORES no relatório. NÃO extraia da transcrição.
+⚠️ REGRA DE SUBSTITUIÇÃO PARA CAMPOS ÚNICOS:
+- Se o campo abaixo estiver preenchido → USE ESTE VALOR (substitui o da transcrição)
+- Se o campo estiver vazio → Extraia da transcrição
+
 - Temperatura: {exame_temperatura}
 - Frequência Cardíaca: {exame_fc}
 - Frequência Respiratória: {exame_fr}
@@ -30,11 +33,21 @@ Você é um assistente especializado em documentação de consultas médicas vet
 - Linfonodos: {exame_linfonodos}
 
 **MEDICAÇÃO PRESCRITA FORNECIDA:**
-⚠️ ATENÇÃO: Se este campo estiver preenchido, USE EXATAMENTE ESTA PRESCRIÇÃO no relatório. NÃO extraia da transcrição.
+⚠️ REGRA DE MESCLAGEM INTELIGENTE:
+- Se medicação fornecida for o MESMO medicamento mencionado na transcrição → SUBSTITUA
+- Se medicação fornecida for ADICIONAL (não mencionada na transcrição) → ADICIONE às medicações da transcrição
+- Mantenha medicações da transcrição que não foram substituídas
+
+Medicações fornecidas:
 {medicacao_info}
 
 **EXAMES COMPLEMENTARES FORNECIDOS:**
-⚠️ ATENÇÃO: Se este campo estiver preenchido, INCLUA ESTES RESULTADOS no relatório.
+⚠️ REGRA DE MESCLAGEM INTELIGENTE:
+- Se exame fornecido for o MESMO tipo mencionado na transcrição → SUBSTITUA o resultado
+- Se exame fornecido for ADICIONAL (tipo não mencionado na transcrição) → ADICIONE aos exames da transcrição
+- Mantenha exames da transcrição que não foram substituídos
+
+Exames fornecidos:
 {exames_complementares}
 
 **TRANSCRIÇÃO DA CONSULTA:**
@@ -106,14 +119,17 @@ Com base na transcrição acima, gere um relatório veterinário profissional se
 
 ## 💊 PRESCRIÇÃO MÉDICA
 
-⚠️ REGRA CRÍTICA: Se medicação foi fornecida abaixo, USE EXATAMENTE ESTA PRESCRIÇÃO. NÃO extraia da transcrição.
-
-**Medicações prescritas fornecidas:**
-{medicacao_info}
+⚠️ REGRA DE MESCLAGEM:
+1. Extraia medicações da transcrição
+2. Se houver medicações fornecidas acima:
+   - Compare pelo nome do medicamento
+   - Se MESMO medicamento → use a versão fornecida (substitui)
+   - Se medicamento NOVO → adicione à lista
+3. Inclua TODAS as medicações finais na tabela
 
 | Medicamento | Princípio Ativo | Dosagem | Via | Frequência | Duração | Observações |
 |-------------|-----------------|---------|-----|------------|---------|-------------|
-| [SE medicação fornecida acima: formatar em tabela. SENÃO: extrair da transcrição] | | | | | | |
+| [Listar TODAS: da transcrição + fornecidas (mescladas conforme regra)] | | | | | | |
 
 **Se não houver prescrições:** "Sem novas prescrições - manter tratamento anterior"
 
@@ -134,12 +150,19 @@ Com base na transcrição acima, gere um relatório veterinário profissional se
 
 ## 📊 EXAMES COMPLEMENTARES
 
-**Resultados de Exames Fornecidos:**
-{exames_complementares}
-[Se resultados foram fornecidos acima, incluir no relatório. Se vazio, extrair da transcrição]
+⚠️ REGRA DE MESCLAGEM:
+1. Extraia exames da transcrição (realizados e solicitados)
+2. Se houver exames fornecidos acima:
+   - Compare pelo tipo de exame (ex: "Hemograma", "Ultrassom", "Raio-X")
+   - Se MESMO tipo → use o resultado fornecido (substitui)
+   - Se tipo NOVO → adicione à lista
+3. Inclua TODOS os exames finais
+
+**Exames Realizados (resultados):**
+- [Listar TODOS: da transcrição + fornecidos (mesclados conforme regra)]
 
 **Exames Solicitados:**
-- [Listar com prazos se mencionados]
+- [Listar com prazos se mencionados na transcrição]
 
 ## 🔄 PLANO DE ACOMPANHAMENTO
 

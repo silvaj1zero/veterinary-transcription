@@ -583,7 +583,7 @@ elif menu == "➕ Nova Consulta":
             # Exame Clínico (Opcional)
             st.markdown("---")
             st.subheader("🩺 Exame Físico Geral (Opcional)")
-            st.caption("💡 Preencha apenas os campos que deseja que apareçam no relatório. Campos vazios serão extraídos da transcrição.")
+            st.caption("💡 **Campos únicos:** Se preenchido, substitui o da transcrição. Se vazio, extrai da transcrição.")
 
             col1, col2, col3 = st.columns(3)
             with col1:
@@ -600,7 +600,7 @@ elif menu == "➕ Nova Consulta":
             # Medicação e Exames (Opcional)
             st.markdown("---")
             st.subheader("💊 Medicação e Exames (Opcional)")
-            st.caption("💡 Preencha se quiser adicionar/substituir medicação ou exames. Campos vazios serão extraídos da transcrição.")
+            st.caption("💡 **Mesclagem inteligente:** Mesmo medicamento/exame → substitui. Adicional → mantém ambos (transcrição + preenchido).")
 
             medicacao_info = st.text_area(
                 "Medicação Prescrita",
