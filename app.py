@@ -193,12 +193,9 @@ def convert_md_to_pdf(md_content, output_filename):
         else:
             # Texto normal - pode ter negrito
             pdf.set_font('Helvetica', '', 9)
-            # Se tiver **, tornar negrito mas manter o texto
-            if '**' in line:
-                # Remover ** mas manter o conteúdo
-                text = line.replace('**', '')
-                if text.strip():  # Se ainda tem conteúdo depois de remover **
-                    pdf.set_font('Helvetica', 'B', 9)
+
+        # Remover TODOS os ** de formatação Markdown (aplicar APÓS definir tipo de linha)
+        text = text.replace('**', '')
 
         # Remover emojis
         text = re.sub(r'[\U0001F000-\U0001FFFF]+', '', text)
@@ -347,7 +344,7 @@ with st.sidebar:
     st.metric("Custo Hoje", f"${stats['custo_hoje']:.2f}")
 
     st.markdown("---")
-    st.caption("v1.1 - Interface Streamlit")
+    st.caption("v1.3 - Production Ready")
 
 # Conteúdo principal
 if menu == "📊 Dashboard":
@@ -992,7 +989,7 @@ elif menu == "⚙️ Configurações":
     st.markdown("""
     **Sistema de Documentação de Consultas Veterinárias**
 
-    - **Versão:** 1.1 (Interface Streamlit)
+    - **Versão:** 1.3 - Production Ready
     - **Desenvolvido por:** BadiLab
     - **Data:** Novembro 2025
 
@@ -1003,11 +1000,25 @@ elif menu == "⚙️ Configurações":
     - ✅ Interface gráfica moderna (Streamlit)
     - ✅ Dashboard com estatísticas
     - ✅ Histórico de consultas
+    - ✅ Edição de relatórios gerados
+    - ✅ Campos opcionais com mesclagem inteligente
+    - ✅ Exportação PDF otimizada
+
+    **Changelog v1.3:**
+    - 🔧 Correção de formatação Markdown em PDFs (remoção de **)
+    - 🧠 Mesclagem inteligente de dados opcionais:
+      - Campos únicos (temperatura, FC, etc.) substituem transcrição
+      - Medicações: mesmo medicamento → substitui; adicional → mescla
+      - Exames: mesmo tipo → substitui; adicional → mescla
+    - ⚡ Otimização Whisper: modelo `base` para Railway (5-10x mais rápido)
+    - ✏️ Sistema de edição de relatórios no histórico
+    - 📋 Campos opcionais para veterinário, exame clínico, medicação e exames
 
     **Documentação:**
     - README.md
     - GUIA_RAPIDO.md
     - USO_TRANSCRICAO_MANUAL.md
+    - OTIMIZACOES_WHISPER.md
     """)
 
     st.markdown("---")
@@ -1053,4 +1064,4 @@ elif menu == "⚙️ Configurações":
 
 # Footer
 st.markdown("---")
-st.caption("🏥 Sistema de Documentação Veterinária v1.1 | Desenvolvido por BadiLab | Powered by Streamlit, Whisper AI & Claude API")
+st.caption("🏥 Sistema de Documentação Veterinária v1.3 | Desenvolvido por BadiLab | Powered by Streamlit, Whisper AI & Claude API")
