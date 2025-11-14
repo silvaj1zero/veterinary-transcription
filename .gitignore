@@ -41,6 +41,7 @@ cost_log.txt
 # Sistema
 .DS_Store
 Thumbs.db
+nul
 
 # Backups e arquivos temporários
 backup_*/
