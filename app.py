@@ -19,7 +19,7 @@ import re
 from fpdf import FPDF
 
 # Configurar caminho do FFmpeg
-os.environ['PATH'] = r'C:\Users\Zero\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-8.0-full_build\bin;' + os.environ['PATH']
+# os.environ['PATH'] = r'C:\Users\Zero\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-8.0-full_build\bin;' + os.environ['PATH']
 
 # Carregar variáveis de ambiente
 load_dotenv()
