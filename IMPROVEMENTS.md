@@ -413,3 +413,131 @@ As melhorias implementadas transformam o sistema de um MVP funcional para uma so
 **Desenvolvido por:** BadiLab
 **Versão:** 1.2
 **Data:** Novembro 2025
+
+---
+
+## 📋 Versão 1.3 - PLANEJADA
+
+### Feature: Modo Transcrição Pronta
+
+**Status:** 📋 Documentado para Implementação Futura
+**Prioridade:** Alta
+**Tempo Estimado:** 2-3 dias (15-16 horas)
+
+#### Visão Geral
+
+Adicionar funcionalidade que permite ao usuário **pular a etapa de transcrição Whisper** e inserir texto já transcrito de aplicativos móveis, reduzindo o tempo de processamento de **5-7 minutos para 1-2 minutos** por consulta.
+
+#### Problema a Resolver
+
+A transcrição Whisper na web:
+- É lenta (2-5 minutos por áudio de 5-10 min)
+- Depende de conexão estável
+- Usa recursos computacionais significativos
+- Adiciona custo de ~$0.006/minuto
+
+#### Solução Proposta
+
+Nova aba "📝 Consulta com Texto" que permite:
+1. Inserir texto já transcrito do smartphone
+2. Opcionalmente anexar áudio original
+3. Pular processamento Whisper completamente
+4. Gerar relatório apenas com Claude API
+
+#### Apps de Transcrição Recomendados
+
+**Android:**
+- **Google Recorder** ⭐ (grátis, offline, excelente qualidade)
+- Otter.ai (grátis 600 min/mês, requer internet)
+- Speechnotes (grátis, requer internet)
+
+**iOS:**
+- **Notas de Voz (nativo)** ⭐ (iOS 17+, grátis, offline)
+- Just Press Record (R$ 24,90 compra única, offline)
+- Otter.ai (mesmas características do Android)
+
+#### Benefícios Esperados
+
+| Métrica | Antes | Depois | Melhoria |
+|---------|-------|--------|----------|
+| **Tempo total** | 5-7 min | 1-2 min | **~70% mais rápido** |
+| **Custo/consulta** | $0.080 | $0.050 | **37.5% mais barato** |
+| **Dependência internet** | Alta | Baixa | **Maior resiliência** |
+| **Offline-first** | Não | Sim* | **Novo recurso** |
+
+*Transcrição pode ser feita offline no smartphone
+
+#### ROI Estimado
+
+**Cenário: Clínica com 10 consultas/dia**
+
+- Tempo economizado/mês: **18.3 horas**
+- Custo economizado/mês: **$6.60**
+- Tempo economizado/ano: **220 horas**
+- Custo economizado/ano: **$79.20**
+- Valor do tempo (se hora = $50): **$11.000/ano**
+
+#### Implementação Prevista
+
+**Fase 1: Backend (4h)**
+- Adicionar `validate_transcription_text()` em `utils.py`
+- Adicionar `save_manual_transcription()` em `utils.py`
+- Modificar `config.py` com novos parâmetros
+
+**Fase 2: Frontend (4h)**
+- Nova aba no menu do Streamlit
+- Formulário de paciente (reutilizar existente)
+- Campo de texto para transcrição (min: 50, max: 10.000 caracteres)
+- Upload opcional de áudio
+
+**Fase 3: Testes (4h)**
+- Testes unitários de validação
+- Testes de integração do fluxo completo
+- Cobertura mantida > 70%
+
+**Fase 4: Documentação (3h)**
+- Atualizar `MANUAL_USUARIO.md`
+- Atualizar `DOCUMENTACAO_TECNICA.md`
+- Guia de uso de apps móveis
+
+#### Arquivos Afetados
+
+**Novos:**
+- `tests/test_manual_text.py` - Testes da feature
+- `tests/test_integration_text.py` - Testes de integração
+- `FEATURE_TRANSCRICAO_PRONTA.md` - Documentação completa ✅
+
+**Modificados:**
+- `app.py` - Nova aba e processamento
+- `utils.py` - Funções de validação e salvamento
+- `config.py` - Novas configurações
+- `MANUAL_USUARIO.md` - Instruções de uso
+- `DOCUMENTACAO_TECNICA.md` - Documentação técnica
+
+#### Riscos e Mitigações
+
+| Risco | Mitigação |
+|-------|-----------|
+| Usuário não sabe usar app mobile | Documentação detalhada + vídeo tutorial |
+| Texto mal transcrito | Permitir edição antes de enviar |
+| Perda de contexto de áudio | Permitir anexar áudio original |
+
+#### Dependências
+
+**Nenhuma nova dependência necessária!**
+Utiliza bibliotecas já existentes do sistema.
+
+#### Documentação Completa
+
+Ver arquivo: **`FEATURE_TRANSCRICAO_PRONTA.md`**
+- 960 linhas de documentação técnica detalhada
+- Mockups de interface
+- Diagramas de fluxo
+- Especificações completas
+- Guia de implementação passo a passo
+- Casos de teste
+- Roadmap versões 1.3, 1.4, 1.5
+
+---
+
+**Atualizado:** 2025-11-15
