@@ -70,8 +70,9 @@ class VeterinaryTranscription:
         print("OK - Cliente Anthropic inicializado!")
         logging.info("Cliente Anthropic inicializado")
 
-        # Carregar template de prompt
+        # Carregar templates de prompt
         self.prompt_template = self._load_prompt_template()
+        self.prompt_resumo_tutor = self._load_prompt_resumo_tutor()
         logging.info("Sistema inicializado com sucesso")
 
     def _ensure_whisper_loaded(self):
@@ -89,6 +90,17 @@ class VeterinaryTranscription:
         else:
             raise FileNotFoundError(
                 f"ERRO - Template não encontrado: {config.PROMPT_TEMPLATE_FILE}"
+            )
+
+    def _load_prompt_resumo_tutor(self):
+        """Carrega o template de prompt para resumo do tutor"""
+        template_path = config.TEMPLATE_DIR / "prompt_resumo_tutor.txt"
+        if template_path.exists():
+            with open(template_path, 'r', encoding='utf-8') as f:
+                return f.read()
+        else:
+            raise FileNotFoundError(
+                f"ERRO - Template de resumo não encontrado: {template_path}"
             )
 
     def transcribe_audio(self, audio_path):
@@ -227,6 +239,55 @@ class VeterinaryTranscription:
         except Exception as e:
             logging.error(f"Erro inesperado ao gerar relatório: {e}")
             print(f"ERRO - Erro ao gerar relatório: {str(e)}")
+            raise
+
+    @retry_with_backoff(max_retries=4, initial_delay=2.0, backoff_factor=2.0)
+    def generate_tutor_summary(self, report_text, patient_info):
+        """
+        Gera resumo para o tutor a partir do relatório médico completo
+
+        Args:
+            report_text (str): Relatório médico completo
+            patient_info (dict): Informações do paciente
+
+        Returns:
+            str: Resumo formatado para o tutor
+        """
+        print("\nGerando resumo para o tutor...")
+        logging.info("Iniciando geração de resumo para tutor")
+
+        # Montar prompt com dados do paciente e relatório
+        prompt = self.prompt_resumo_tutor.format(
+            relatorio_completo=report_text,
+            **patient_info
+        )
+
+        # Chamar API Claude
+        try:
+            message = self.anthropic_client.messages.create(
+                model="claude-sonnet-4-20250514",
+                max_tokens=3000,
+                temperature=0.5,  # Um pouco mais criativo para linguagem coloquial
+                messages=[
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ]
+            )
+
+            summary = message.content[0].text
+
+            # Estatísticas de uso
+            usage = message.usage
+            print(f"Stats: Tokens usados: {usage.input_tokens} input, {usage.output_tokens} output")
+            logging.info(f"Resumo para tutor gerado - Tokens: {usage.input_tokens} input, {usage.output_tokens} output")
+
+            return summary
+
+        except Exception as e:
+            logging.error(f"Erro ao gerar resumo para tutor: {e}")
+            print(f"ERRO - Erro ao gerar resumo: {str(e)}")
             raise
 
     def save_report(self, report_text, patient_name, audio_filename):

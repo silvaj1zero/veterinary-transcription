@@ -183,7 +183,7 @@ with st.sidebar:
     st.metric("Custo Hoje", f"${stats['custo_hoje']:.2f}")
 
     st.markdown("---")
-    st.caption("v1.5 - Fast Mode & Unicode Ready")
+    st.caption("v1.6 - Resumo para Tutor & UX")
 
 # Conteúdo principal
 if menu == "📊 Dashboard":
@@ -319,6 +319,18 @@ if menu == "📊 Dashboard":
 
 elif menu == "➕ Nova Consulta":
     st.markdown('<p class="main-header">➕ Nova Consulta Veterinária</p>', unsafe_allow_html=True)
+
+    # Botão de Limpar Tudo (fora do formulário, no topo)
+    col_header1, col_header2 = st.columns([4, 1])
+    with col_header2:
+        if st.button("🗑️ Limpar Tudo", use_container_width=True, type="secondary"):
+            # Limpar session state
+            keys_to_clear = ['audio_path', 'transcription', 'processing_mode', 'show_result', 'last_report',
+                           'tutor_summary', 'tutor_summary_path', 'last_patient_info']
+            for key in keys_to_clear:
+                if key in st.session_state:
+                    del st.session_state[key]
+            st.rerun()
 
     # Escolher método
     st.subheader("Escolha o método de entrada")
@@ -493,25 +505,8 @@ elif menu == "➕ Nova Consulta":
 
             st.markdown("---")
 
-            # Botões de ação
-            col_btn1, col_btn2, col_btn3 = st.columns([1, 1, 1])
-
-            with col_btn1:
-                limpar = st.form_submit_button("🗑️ Limpar Formulário", type="secondary", use_container_width=True)
-
-            with col_btn2:
-                submitted = st.form_submit_button("🚀 Gerar Relatório", type="primary", use_container_width=True)
-
-            with col_btn3:
-                pass  # Espaço para futuro botão
-
-            if limpar:
-                # Limpar session state
-                keys_to_clear = ['audio_path', 'transcription', 'processing_mode', 'show_result', 'last_report']
-                for key in keys_to_clear:
-                    if key in st.session_state:
-                        del st.session_state[key]
-                st.rerun()
+            # Botão de ação
+            submitted = st.form_submit_button("🚀 Gerar Relatório Médico Completo", type="primary", use_container_width=True)
 
             if submitted:
                 # Preparar dados do paciente
@@ -575,6 +570,7 @@ elif menu == "➕ Nova Consulta":
                                     )
 
                                 st.session_state['last_report'] = report_path
+                                st.session_state['last_patient_info'] = patient_info  # Salvar para usar no resumo
                                 st.session_state['show_result'] = True
                                 logging.info(f"Relatório gerado com sucesso: {report_path.name}")
 
@@ -671,17 +667,109 @@ elif menu == "➕ Nova Consulta":
                 use_container_width=True
             )
 
-        # Preview do relatório
+        # Botão para gerar resumo para o tutor
         st.markdown("---")
-        st.subheader("📖 Preview do Relatório")
+        st.subheader("💬 Resumo para o Tutor")
+
+        if 'tutor_summary' not in st.session_state:
+            st.info("📱 **Novo:** Gere uma versão simplificada deste relatório para enviar ao tutor!")
+
+            if st.button("✨ Gerar Resumo para o Tutor", type="primary", use_container_width=True):
+                with st.spinner("🔄 Gerando resumo simplificado para o tutor..."):
+                    try:
+                        # Ler relatório completo
+                        with open(report_path, 'r', encoding='utf-8') as f:
+                            full_report = f.read()
+
+                        # Inicializar sistema
+                        system = VeterinaryTranscription(load_whisper=False)
+
+                        # Recuperar patient_info do session_state
+                        patient_info = st.session_state.get('last_patient_info', {})
+
+                        # Gerar resumo
+                        summary = system.generate_tutor_summary(full_report, patient_info)
+
+                        # Salvar no session_state
+                        st.session_state['tutor_summary'] = summary
+
+                        # Salvar arquivo
+                        summary_filename = report_path.stem + '_resumo_tutor.md'
+                        summary_path = config.REPORT_DIR / summary_filename
+                        with open(summary_path, 'w', encoding='utf-8') as f:
+                            f.write(summary)
+
+                        st.session_state['tutor_summary_path'] = summary_path
+                        logging.info(f"Resumo para tutor gerado: {summary_filename}")
+
+                        st.rerun()
+
+                    except Exception as e:
+                        st.error(f"❌ Erro ao gerar resumo: {str(e)}")
+                        logging.error(f"Erro ao gerar resumo para tutor: {e}")
+        else:
+            # Mostrar resumo gerado
+            st.success("✅ Resumo para o Tutor gerado com sucesso!")
+
+            # Botões de download do resumo
+            col_sum_md, col_sum_txt, col_sum_pdf = st.columns(3)
+
+            summary_content = st.session_state['tutor_summary']
+            summary_path = st.session_state.get('tutor_summary_path', report_path)
+
+            with col_sum_md:
+                st.download_button(
+                    label="📄 Baixar Resumo MD",
+                    data=summary_content,
+                    file_name=f"{report_path.stem}_resumo_tutor.md",
+                    mime="text/markdown",
+                    use_container_width=True
+                )
+
+            with col_sum_txt:
+                txt_summary = convert_md_to_txt(summary_content)
+                st.download_button(
+                    label="📝 Baixar Resumo TXT",
+                    data=txt_summary,
+                    file_name=f"{report_path.stem}_resumo_tutor.txt",
+                    mime="text/plain",
+                    use_container_width=True
+                )
+
+            with col_sum_pdf:
+                pdf_summary = convert_md_to_pdf(summary_content, f"{report_path.stem}_resumo_tutor.pdf")
+                st.download_button(
+                    label="📕 Baixar Resumo PDF",
+                    data=pdf_summary,
+                    file_name=f"{report_path.stem}_resumo_tutor.pdf",
+                    mime="application/pdf",
+                    use_container_width=True
+                )
+
+            # Preview do resumo
+            st.markdown("---")
+            st.subheader("📱 Preview do Resumo para o Tutor")
+            st.markdown(summary_content)
+
+        # Preview do relatório completo
+        st.markdown("---")
+        st.subheader("📖 Relatório Médico Completo (para prontuário)")
 
         with open(report_path, 'r', encoding='utf-8') as f:
             content = f.read()
-            st.markdown(content)
+            with st.expander("📄 Ver Relatório Completo", expanded=False):
+                st.markdown(content)
 
         if st.button("➕ Nova Consulta"):
             st.session_state['show_result'] = False
-            del st.session_state['last_report']
+            if 'last_report' in st.session_state:
+                del st.session_state['last_report']
+            if 'tutor_summary' in st.session_state:
+                del st.session_state['tutor_summary']
+            if 'tutor_summary_path' in st.session_state:
+                del st.session_state['tutor_summary_path']
+            if 'last_patient_info' in st.session_state:
+                del st.session_state['last_patient_info']
             st.rerun()
 
 elif menu == "📋 Histórico":
@@ -895,14 +983,16 @@ elif menu == "⚙️ Configurações":
     st.markdown("""
     **Sistema de Documentação de Consultas Veterinárias**
 
-    - **Versão:** 1.5 - Fast Mode & Unicode Ready
+    - **Versão:** 1.6 - Resumo para Tutor & UX
     - **Desenvolvido por:** BadiLab
     - **Data:** Novembro 2025
 
     **Funcionalidades:**
     - ✅ Transcrição automática de áudios (Whisper AI)
     - ✅ Geração de relatórios estruturados (Claude API)
-    - ✅ Processamento de transcrições existentes
+    - ✅ **NOVO:** Resumo para o Tutor (linguagem acessível)
+    - ✅ **NOVO:** Botão Limpar Tudo (reinício rápido)
+    - ✅ Processamento de transcrições existentes (Fast Mode)
     - ✅ Interface gráfica moderna (Streamlit)
     - ✅ Dashboard com estatísticas (cached)
     - ✅ Histórico de consultas
@@ -910,6 +1000,12 @@ elif menu == "⚙️ Configurações":
     - ✅ Campos opcionais com mesclagem inteligente
     - ✅ Exportação PDF com Unicode completo
     - ✅ Arquitetura modular e testável
+
+    **Changelog v1.6:**
+    - 💬 **Resumo para Tutor:** Versão simplificada do relatório em linguagem coloquial
+    - 🗑️ **Limpar Tudo:** Botão para reiniciar entrada de dados rapidamente
+    - 📋 **2 Documentos:** Relatório técnico (prontuário) + Resumo (tutor)
+    - 🎨 **UX Melhorada:** Interface reorganizada com foco em produtividade
 
     **Changelog v1.5:**
     - 📱 **Modo Transcrição Pronta:** Interface melhorada com apps recomendados
@@ -923,11 +1019,12 @@ elif menu == "⚙️ Configurações":
     - 🐛 **Erros:** Tratamento específico (RateLimitError, APIConnectionError, etc.)
     - 🔒 **Segurança:** Validação de API key antes de processar
     - ⬆️ **Dependências:** Streamlit 1.41.1, pandas 2.2.3, anthropic 0.48.0
-    - 📚 **Documentação:** UPGRADE_GUIDE.md com guia completo
 
     **Documentação:**
     - README.md
-    - UPGRADE_GUIDE.md (NOVO)
+    - RESUMO_VERSOES_1.3_a_1.6.md (NOVO)
+    - CHANGELOG_v1.6.md (NOVO)
+    - UPGRADE_GUIDE.md
     - GUIA_RAPIDO.md
     - USO_TRANSCRICAO_MANUAL.md
     - OTIMIZACOES_WHISPER.md
@@ -976,4 +1073,4 @@ elif menu == "⚙️ Configurações":
 
 # Footer
 st.markdown("---")
-st.caption("🏥 Sistema de Documentação Veterinária v1.5 | Desenvolvido por BadiLab | Powered by Streamlit, Whisper AI & Claude API")
+st.caption("🏥 Sistema de Documentação Veterinária v1.6 | Desenvolvido por BadiLab | Powered by Streamlit, Whisper AI & Claude API")
