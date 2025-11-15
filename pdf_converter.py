@@ -78,10 +78,14 @@ class MarkdownToPDFConverter:
         Returns:
             str: Cleaned text safe for PDF
         """
-        # Escape XML special characters for reportlab
-        text = text.replace('&', '&amp;')
-        text = text.replace('<', '&lt;')
-        text = text.replace('>', '&gt;')
+        # Remove markdown formatting FIRST (asterisks for bold/italic)
+        # This must come before XML escaping to avoid escaping HTML tags
+        text = re.sub(r'\*\*(.+?)\*\*', r'<b>\1</b>', text)  # **bold** → <b>bold</b>
+        text = re.sub(r'\*([^*]+?)\*', r'<i>\1</i>', text)   # *italic* → <i>italic</i>
+
+        # Escape XML special characters for reportlab (but NOT < > for our tags)
+        # Only escape ampersands that are not part of HTML entities
+        text = re.sub(r'&(?![a-zA-Z]+;)', '&amp;', text)
 
         # Remove emojis (they may not render well)
         text = re.sub(r'[\U0001F000-\U0001FFFF]+', '', text)

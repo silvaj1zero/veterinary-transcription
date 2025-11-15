@@ -607,7 +607,7 @@ elif menu == "➕ Nova Consulta":
                 data=md_content,
                 file_name=report_path.name,
                 mime="text/markdown",
-                width='stretch'
+                use_container_width=True
             )
 
         with col_txt:
@@ -618,7 +618,7 @@ elif menu == "➕ Nova Consulta":
                 data=txt_content,
                 file_name=txt_filename,
                 mime="text/plain",
-                width='stretch'
+                use_container_width=True
             )
 
         with col_pdf:
@@ -629,7 +629,7 @@ elif menu == "➕ Nova Consulta":
                 data=pdf_bytes,
                 file_name=pdf_filename,
                 mime="application/pdf",
-                width='stretch'
+                use_container_width=True
             )
 
         # Preview do relatório
