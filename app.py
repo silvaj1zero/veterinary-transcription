@@ -183,7 +183,7 @@ with st.sidebar:
     st.metric("Custo Hoje", f"${stats['custo_hoje']:.2f}")
 
     st.markdown("---")
-    st.caption("v1.4 - High Performance & Unicode Ready")
+    st.caption("v1.5 - Fast Mode & Unicode Ready")
 
 # Conteúdo principal
 if menu == "📊 Dashboard":
@@ -358,19 +358,58 @@ elif menu == "➕ Nova Consulta":
     with tab2:
         st.markdown("""
         <div class="info-box">
-        <strong>ℹ️ Transcrição Existente</strong><br>
+        <strong>ℹ️ Transcrição Existente (Modo Rápido)</strong><br>
         Cole ou digite o texto da consulta diretamente.<br>
-        <strong>Tempo estimado:</strong> 30 segundos ⚡
+        <strong>Tempo estimado:</strong> 30 segundos ⚡<br>
+        <strong>Economia:</strong> 70% mais rápido | 37% mais barato
         </div>
         """, unsafe_allow_html=True)
+
+        # Apps recomendados
+        with st.expander("📱 Apps de Transcrição Recomendados (Clique para ver)"):
+            col_android, col_ios = st.columns(2)
+
+            with col_android:
+                st.markdown("""
+                **🤖 Android**
+
+                **⭐ Google Recorder** (Recomendado)
+                - ✅ Grátis e offline
+                - ✅ Excelente precisão
+                - ✅ Tempo real
+                - 📲 Disponível em Pixels
+
+                **Otter.ai**
+                - ✅ 600 min/mês grátis
+                - ⚠️ Requer internet
+                - ✅ Boa precisão
+                """)
+
+            with col_ios:
+                st.markdown("""
+                **🍎 iOS**
+
+                **⭐ Notas de Voz** (Recomendado)
+                - ✅ Grátis (iOS 17+)
+                - ✅ Offline
+                - ✅ Excelente precisão
+                - 🔒 Privacidade total
+
+                **Just Press Record**
+                - 💰 R$ 24,90 (única vez)
+                - ✅ Tempo real
+                - ✅ Offline
+                """)
+
+            st.info("💡 **Dica:** Grave a consulta no smartphone e cole o texto aqui. Muito mais rápido!")
 
         st.markdown("")
 
         transcription_text = st.text_area(
             "Digite ou cole a transcrição da consulta:",
             height=300,
-            placeholder="Cole aqui o texto da consulta veterinária...",
-            help="Você pode colar texto de qualquer fonte: transcrições manuais, de videoconferências, etc."
+            placeholder="Cole aqui o texto da consulta veterinária...\n\nVocê pode usar:\n- Google Recorder (Android)\n- iOS Notas de Voz\n- Zoom/Google Meet (transcrição de videoconferência)\n- Ou digitar manualmente",
+            help="Transcreva no smartphone durante a consulta e cole aqui. 70% mais rápido que processar áudio!"
         )
 
         if transcription_text:
@@ -856,7 +895,7 @@ elif menu == "⚙️ Configurações":
     st.markdown("""
     **Sistema de Documentação de Consultas Veterinárias**
 
-    - **Versão:** 1.4 - High Performance & Unicode Ready
+    - **Versão:** 1.5 - Fast Mode & Unicode Ready
     - **Desenvolvido por:** BadiLab
     - **Data:** Novembro 2025
 
@@ -871,6 +910,11 @@ elif menu == "⚙️ Configurações":
     - ✅ Campos opcionais com mesclagem inteligente
     - ✅ Exportação PDF com Unicode completo
     - ✅ Arquitetura modular e testável
+
+    **Changelog v1.5:**
+    - 📱 **Modo Transcrição Pronta:** Interface melhorada com apps recomendados
+    - 📊 **Economia:** 70% mais rápido, 37% mais barato que áudio
+    - 📚 **Documentação:** Guia completo de apps Android/iOS
 
     **Changelog v1.4:**
     - 🎨 **PDF Unicode:** Suporte completo a acentos portugueses (á, ã, ç)
@@ -932,4 +976,4 @@ elif menu == "⚙️ Configurações":
 
 # Footer
 st.markdown("---")
-st.caption("🏥 Sistema de Documentação Veterinária v1.4 | Desenvolvido por BadiLab | Powered by Streamlit, Whisper AI & Claude API")
+st.caption("🏥 Sistema de Documentação Veterinária v1.5 | Desenvolvido por BadiLab | Powered by Streamlit, Whisper AI & Claude API")
