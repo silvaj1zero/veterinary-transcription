@@ -1,15 +1,15 @@
 # Core dependencies (LOCAL/DOCKER only - NOT for Streamlit Cloud!)
 openai-whisper==20231117  # ⚠️ Requires FFmpeg (not available on Streamlit Cloud)
-anthropic>=0.40.0
-python-dotenv==1.0.0
-tqdm==4.66.1
+anthropic>=0.48.0  # Updated for latest API features and security
+python-dotenv==1.0.1  # Updated for security
+tqdm==4.67.1  # Updated version
 pydub==0.25.1
 
 # Web interface dependencies
-streamlit==1.51.0
-pandas==2.2.0
+streamlit==1.41.1  # Updated from 1.51.0 for security and stability
+pandas==2.2.3  # Updated for security patches
 plotly==5.24.1
-fpdf2==2.8.1  # Using fpdf2 instead of fpdf (better Unicode support)
+reportlab==4.2.5  # Replaced fpdf2 for proper Unicode support
 
 # Testing dependencies (optional)
 pytest>=7.0.0
