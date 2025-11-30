@@ -413,14 +413,36 @@ elif menu == "➕ Nova Consulta":
                 - ✅ Offline
                 """)
 
+
             st.info("💡 **Dica:** Grave a consulta no smartphone e cole o texto aqui. Muito mais rápido!")
 
         st.markdown("")
 
+        # Upload de arquivo de texto com drag and drop
+        text_file = st.file_uploader(
+            "Arraste e solte o arquivo de texto aqui",
+            type=['txt'],
+            help="Formatos aceitos: TXT",
+            key="text_file_uploader"
+        )
+
+        # Inicializar texto da transcrição
+        initial_text = ""
+        
+        if text_file:
+            try:
+                # Ler conteúdo do arquivo
+                initial_text = text_file.read().decode('utf-8')
+                st.success(f"✅ Arquivo carregado: {text_file.name} ({len(initial_text)} caracteres)")
+            except Exception as e:
+                st.error(f"❌ Erro ao ler arquivo: {e}")
+                initial_text = ""
+
         transcription_text = st.text_area(
             "Digite ou cole a transcrição da consulta:",
+            value=initial_text,
             height=300,
-            placeholder="Cole aqui o texto da consulta veterinária...\n\nVocê pode usar:\n- Google Recorder (Android)\n- iOS Notas de Voz\n- Zoom/Google Meet (transcrição de videoconferência)\n- Ou digitar manualmente",
+            placeholder="Cole aqui o texto da consulta veterinária...\n\nVocê pode usar:\n- Google Recorder (Android)\n- iOS Notas de Voz\n- Zoom/Google Meet (transcrição de videoconferência)\n- Ou digitar manualmente\n- Ou arrastar um arquivo .txt acima",
             help="Transcreva no smartphone durante a consulta e cole aqui. 70% mais rápido que processar áudio!"
         )
 

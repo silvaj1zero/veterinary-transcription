@@ -32,8 +32,8 @@ TRANSCRIPTION_PROVIDER = os.getenv("TRANSCRIPTION_PROVIDER", "openai_whisper")
 LLM_PROVIDER = os.getenv("LLM_PROVIDER", "anthropic_claude")
 
 # Modelos Gemini
-GEMINI_MODEL_FLASH = "gemini-1.5-flash" # Mais rápido e barato
-GEMINI_MODEL_PRO = "gemini-1.5-pro"     # Mais capaz
+GEMINI_MODEL_FLASH = "gemini-2.5-flash" 
+GEMINI_MODEL_PRO = "gemini-2.5-pro-preview-03-25"
 
 # Configurações de processamento
 AUDIO_EXTENSIONS = ['.mp3', '.wav', '.m4a', '.ogg', '.flac']
