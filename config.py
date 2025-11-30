@@ -22,6 +22,18 @@ WHISPER_MODEL = os.getenv("WHISPER_MODEL", "base")  # Permite override via env v
 
 # API Keys (será carregada do arquivo .env)
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
+
+# Configuração de Provedores
+# Opções: "openai_whisper" (local), "google_gemini" (nuvem)
+TRANSCRIPTION_PROVIDER = os.getenv("TRANSCRIPTION_PROVIDER", "openai_whisper")
+
+# Opções: "anthropic_claude", "google_gemini"
+LLM_PROVIDER = os.getenv("LLM_PROVIDER", "anthropic_claude")
+
+# Modelos Gemini
+GEMINI_MODEL_FLASH = "gemini-1.5-flash" # Mais rápido e barato
+GEMINI_MODEL_PRO = "gemini-1.5-pro"     # Mais capaz
 
 # Configurações de processamento
 AUDIO_EXTENSIONS = ['.mp3', '.wav', '.m4a', '.ogg', '.flac']

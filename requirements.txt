@@ -4,6 +4,7 @@ anthropic>=0.48.0  # Updated for latest API features and security
 python-dotenv==1.0.1  # Updated for security
 tqdm==4.67.1  # Updated version
 pydub==0.25.1
+google-generativeai>=0.3.0
 
 # Web interface dependencies
 streamlit==1.41.1  # Updated from 1.51.0 for security and stability

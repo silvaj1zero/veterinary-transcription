@@ -2,21 +2,18 @@
 """
 Sistema de Transcrição e Documentação de Consultas Veterinárias
 Autor: BadiLab
-Versão: 1.0
+Versão: 1.3
 """
 
-import whisper
-import anthropic
+import sys
+import logging
 from pathlib import Path
 from datetime import datetime
-from tqdm import tqdm
-import sys
-import json
-import os
-import logging
 from dotenv import load_dotenv
 import config
-from utils import setup_ffmpeg, validate_patient_info, retry_with_backoff
+from utils import setup_ffmpeg, validate_patient_info
+from services.transcription_service import get_transcription_service
+from services.llm_service import get_llm_service
 
 # Carregar variáveis de ambiente
 load_dotenv()
@@ -47,40 +44,28 @@ class VeterinaryTranscription:
     def __init__(self, load_whisper=True):
         """
         Inicializa o sistema
-
-        Args:
-            load_whisper (bool): Se True, carrega o modelo Whisper.
-                                 Se False, carrega apenas o cliente Anthropic
         """
         print("Inicializando sistema...")
         logging.info("Inicializando VeterinaryTranscription")
 
-        # Whisper será carregado sob demanda
-        self.whisper_model = None
-        self.load_whisper_enabled = load_whisper
-
-        # Inicializar cliente Anthropic
-        if not config.ANTHROPIC_API_KEY:
-            logging.error("ANTHROPIC_API_KEY não encontrada")
-            raise ValueError("ERRO - ANTHROPIC_API_KEY não encontrada! Configure no arquivo .env")
-
-        self.anthropic_client = anthropic.Anthropic(
-            api_key=config.ANTHROPIC_API_KEY
-        )
-        print("OK - Cliente Anthropic inicializado!")
-        logging.info("Cliente Anthropic inicializado")
+        # Inicializar serviços
+        try:
+            # O parâmetro load_whisper é mantido para compatibilidade, 
+            # mas a lógica de carregamento preguiçoso agora está dentro do serviço Whisper
+            self.transcription_service = get_transcription_service()
+            self.llm_service = get_llm_service()
+            
+            print(f"Provedor Transcrição: {config.TRANSCRIPTION_PROVIDER}")
+            print(f"Provedor LLM: {config.LLM_PROVIDER}")
+            
+        except Exception as e:
+            logging.error(f"Erro ao inicializar serviços: {e}")
+            raise
 
         # Carregar templates de prompt
         self.prompt_template = self._load_prompt_template()
         self.prompt_resumo_tutor = self._load_prompt_resumo_tutor()
         logging.info("Sistema inicializado com sucesso")
-
-    def _ensure_whisper_loaded(self):
-        """Carrega o modelo Whisper se ainda não estiver carregado"""
-        if self.whisper_model is None:
-            print(f"Carregando modelo Whisper '{config.WHISPER_MODEL}'...")
-            self.whisper_model = whisper.load_model(config.WHISPER_MODEL)
-            print("OK - Modelo Whisper carregado!")
 
     def _load_prompt_template(self):
         """Carrega o template de prompt"""
@@ -105,31 +90,13 @@ class VeterinaryTranscription:
 
     def transcribe_audio(self, audio_path):
         """
-        Transcreve áudio usando Whisper
-
-        Args:
-            audio_path (Path): Caminho do arquivo de áudio
-
-        Returns:
-            dict: Resultado da transcrição
+        Transcreve áudio usando o serviço configurado
         """
         print(f"\nTranscrevendo: {audio_path.name}")
-        logging.info(f"Iniciando transcrição de áudio: {audio_path.name}")
-
-        # Garantir que o Whisper está carregado
-        self._ensure_whisper_loaded()
+        logging.info(f"Iniciando transcrição: {audio_path.name}")
 
         try:
-            # Otimizações para processamento em CPU (Railway/produção)
-            result = self.whisper_model.transcribe(
-                str(audio_path),
-                language=config.DEFAULT_LANGUAGE,
-                verbose=False,
-                fp16=False,  # Desabilitar FP16 (não suportado em CPU)
-                beam_size=1,  # Reduzir beam search para acelerar (5 é default)
-                best_of=1,    # Reduzir número de candidatos (5 é default)
-                temperature=0.0  # Determinístico e mais rápido
-            )
+            result = self.transcription_service.transcribe(audio_path)
 
             # Salvar transcrição
             transcription_file = config.TRANSCRIPTION_DIR / f"{audio_path.stem}_transcricao.txt"
@@ -148,9 +115,6 @@ class VeterinaryTranscription:
     def collect_patient_info(self):
         """
         Coleta informações do paciente de forma interativa
-
-        Returns:
-            dict: Dicionário com informações do paciente
         """
         print("\n" + "="*60)
         print("COLETA DE INFORMACOES DO PACIENTE")
@@ -184,20 +148,12 @@ class VeterinaryTranscription:
                 if retry != 's':
                     raise
 
-    @retry_with_backoff(max_retries=4, initial_delay=2.0, backoff_factor=2.0)
     def generate_report(self, transcription_text, patient_info):
         """
-        Gera relatório estruturado usando Claude API (com retry automático)
-
-        Args:
-            transcription_text (str): Texto da transcrição
-            patient_info (dict): Informações do paciente
-
-        Returns:
-            str: Relatório formatado
+        Gera relatório estruturado usando o serviço LLM configurado
         """
-        print("\nGerando relatorio com Claude API...")
-        logging.info("Iniciando geração de relatório via Claude API")
+        print(f"\nGerando relatorio com {config.LLM_PROVIDER}...")
+        logging.info(f"Iniciando geração de relatório via {config.LLM_PROVIDER}")
 
         # Montar prompt com dados do paciente
         prompt = self.prompt_template.format(
@@ -205,53 +161,19 @@ class VeterinaryTranscription:
             **patient_info
         )
 
-        # Chamar API Claude (retry automático via decorator)
         try:
-            message = self.anthropic_client.messages.create(
-                model="claude-sonnet-4-20250514",
-                max_tokens=4000,
-                temperature=0.3,  # Baixa temperatura para maior consistência
-                messages=[
-                    {
-                        "role": "user",
-                        "content": prompt
-                    }
-                ]
-            )
-
-            report = message.content[0].text
-
-            # Estatísticas de uso
-            usage = message.usage
-            print(f"Stats: Tokens usados: {usage.input_tokens} input, {usage.output_tokens} output")
-            logging.info(f"Relatório gerado com sucesso - Tokens: {usage.input_tokens} input, {usage.output_tokens} output")
-
+            report = self.llm_service.generate_report(prompt)
+            logging.info("Relatório gerado com sucesso")
             return report
 
-        except anthropic.RateLimitError as e:
-            logging.error(f"Limite de taxa excedido: {e}")
-            print(f"ERRO - Limite de taxa da API excedido. Aguarde alguns minutos.")
-            raise
-        except anthropic.APIError as e:
-            logging.error(f"Erro da API Claude: {e}")
-            print(f"ERRO - Erro da API Claude: {str(e)}")
-            raise
         except Exception as e:
-            logging.error(f"Erro inesperado ao gerar relatório: {e}")
+            logging.error(f"Erro ao gerar relatório: {e}")
             print(f"ERRO - Erro ao gerar relatório: {str(e)}")
             raise
 
-    @retry_with_backoff(max_retries=4, initial_delay=2.0, backoff_factor=2.0)
     def generate_tutor_summary(self, report_text, patient_info):
         """
-        Gera resumo para o tutor a partir do relatório médico completo
-
-        Args:
-            report_text (str): Relatório médico completo
-            patient_info (dict): Informações do paciente
-
-        Returns:
-            str: Resumo formatado para o tutor
+        Gera resumo para o tutor
         """
         print("\nGerando resumo para o tutor...")
         logging.info("Iniciando geração de resumo para tutor")
@@ -262,27 +184,9 @@ class VeterinaryTranscription:
             **patient_info
         )
 
-        # Chamar API Claude
         try:
-            message = self.anthropic_client.messages.create(
-                model="claude-sonnet-4-20250514",
-                max_tokens=3000,
-                temperature=0.5,  # Um pouco mais criativo para linguagem coloquial
-                messages=[
-                    {
-                        "role": "user",
-                        "content": prompt
-                    }
-                ]
-            )
-
-            summary = message.content[0].text
-
-            # Estatísticas de uso
-            usage = message.usage
-            print(f"Stats: Tokens usados: {usage.input_tokens} input, {usage.output_tokens} output")
-            logging.info(f"Resumo para tutor gerado - Tokens: {usage.input_tokens} input, {usage.output_tokens} output")
-
+            summary = self.llm_service.generate_report(prompt)
+            logging.info("Resumo para tutor gerado")
             return summary
 
         except Exception as e:
@@ -293,11 +197,6 @@ class VeterinaryTranscription:
     def save_report(self, report_text, patient_name, audio_filename):
         """
         Salva o relatório em arquivo
-
-        Args:
-            report_text (str): Texto do relatório
-            patient_name (str): Nome do paciente
-            audio_filename (str): Nome do arquivo de áudio original
         """
         # Nome do arquivo: data_paciente_audio.md
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -315,10 +214,6 @@ class VeterinaryTranscription:
     def process_consultation(self, audio_path, patient_info=None):
         """
         Processa uma consulta completa: transcrição + relatório
-
-        Args:
-            audio_path (Path): Caminho do arquivo de áudio
-            patient_info (dict, optional): Informações do paciente. Se None, coleta interativamente
         """
         print("\n" + "="*60)
         print(f"PROCESSANDO CONSULTA: {audio_path.name}")
@@ -375,11 +270,6 @@ class VeterinaryTranscription:
     def process_from_text(self, transcription_text, patient_info=None, source_name="transcrição_manual"):
         """
         Processa relatório a partir de texto de transcrição já existente
-
-        Args:
-            transcription_text (str): Texto da transcrição
-            patient_info (dict, optional): Informações do paciente. Se None, coleta interativamente
-            source_name (str): Nome de referência para o arquivo
         """
         print("\n" + "="*60)
         print("PROCESSANDO TRANSCRICAO EXISTENTE")
@@ -419,7 +309,6 @@ class VeterinaryTranscription:
     def get_transcription_from_user(self):
         """
         Obtém texto de transcrição do usuário
-        Permite colar texto ou ler de arquivo
         """
         print("\n" + "="*60)
         print("FORNECER TRANSCRICAO")

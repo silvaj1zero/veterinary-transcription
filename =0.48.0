@@ -1,0 +1,122 @@
+Collecting streamlit==1.41.1
+  Downloading streamlit-1.41.1-py2.py3-none-any.whl.metadata (8.5 kB)
+Collecting pandas==2.2.3
+  Downloading pandas-2.2.3-cp312-cp312-win_amd64.whl.metadata (19 kB)
+Requirement already satisfied: anthropic in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (0.72.1)
+Collecting anthropic
+  Downloading anthropic-0.73.0-py3-none-any.whl.metadata (28 kB)
+Collecting python-dotenv==1.0.1
+  Downloading python_dotenv-1.0.1-py3-none-any.whl.metadata (23 kB)
+Collecting tqdm==4.67.1
+  Using cached tqdm-4.67.1-py3-none-any.whl.metadata (57 kB)
+Requirement already satisfied: altair<6,>=4.0 in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (from streamlit==1.41.1) (5.5.0)
+Requirement already satisfied: blinker<2,>=1.0.0 in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (from streamlit==1.41.1) (1.9.0)
+Collecting cachetools<6,>=4.0 (from streamlit==1.41.1)
+  Downloading cachetools-5.5.2-py3-none-any.whl.metadata (5.4 kB)
+Requirement already satisfied: click<9,>=7.0 in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (from streamlit==1.41.1) (8.3.0)
+Requirement already satisfied: numpy<3,>=1.23 in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (from streamlit==1.41.1) (1.26.4)
+Collecting packaging<25,>=20 (from streamlit==1.41.1)
+  Downloading packaging-24.2-py3-none-any.whl.metadata (3.2 kB)
+Collecting pillow<12,>=7.1.0 (from streamlit==1.41.1)
+  Downloading pillow-11.3.0-cp312-cp312-win_amd64.whl.metadata (9.2 kB)
+Collecting protobuf<6,>=3.20 (from streamlit==1.41.1)
+  Downloading protobuf-5.29.5-cp310-abi3-win_amd64.whl.metadata (592 bytes)
+Requirement already satisfied: pyarrow>=7.0 in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (from streamlit==1.41.1) (21.0.0)
+Requirement already satisfied: requests<3,>=2.27 in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (from streamlit==1.41.1) (2.32.5)
+Collecting rich<14,>=10.14.0 (from streamlit==1.41.1)
+  Downloading rich-13.9.4-py3-none-any.whl.metadata (18 kB)
+Requirement already satisfied: tenacity<10,>=8.1.0 in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (from streamlit==1.41.1) (9.1.2)
+Requirement already satisfied: toml<2,>=0.10.1 in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (from streamlit==1.41.1) (0.10.2)
+Requirement already satisfied: typing-extensions<5,>=4.3.0 in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (from streamlit==1.41.1) (4.15.0)
+Requirement already satisfied: watchdog<7,>=2.1.5 in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (from streamlit==1.41.1) (6.0.0)
+Requirement already satisfied: gitpython!=3.1.19,<4,>=3.0.7 in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (from streamlit==1.41.1) (3.1.45)
+Requirement already satisfied: pydeck<1,>=0.8.0b4 in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (from streamlit==1.41.1) (0.9.1)
+Requirement already satisfied: tornado<7,>=6.0.3 in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (from streamlit==1.41.1) (6.5.2)
+Requirement already satisfied: python-dateutil>=2.8.2 in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (from pandas==2.2.3) (2.9.0.post0)
+Requirement already satisfied: pytz>=2020.1 in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (from pandas==2.2.3) (2025.2)
+Requirement already satisfied: tzdata>=2022.7 in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (from pandas==2.2.3) (2025.2)
+Requirement already satisfied: colorama in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (from tqdm==4.67.1) (0.4.6)
+Requirement already satisfied: jinja2 in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (from altair<6,>=4.0->streamlit==1.41.1) (3.1.6)
+Requirement already satisfied: jsonschema>=3.0 in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (from altair<6,>=4.0->streamlit==1.41.1) (4.25.1)
+Requirement already satisfied: narwhals>=1.14.2 in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (from altair<6,>=4.0->streamlit==1.41.1) (2.11.0)
+Requirement already satisfied: gitdb<5,>=4.0.1 in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (from gitpython!=3.1.19,<4,>=3.0.7->streamlit==1.41.1) (4.0.12)
+Requirement already satisfied: smmap<6,>=3.0.1 in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (from gitdb<5,>=4.0.1->gitpython!=3.1.19,<4,>=3.0.7->streamlit==1.41.1) (5.0.2)
+Requirement already satisfied: charset_normalizer<4,>=2 in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (from requests<3,>=2.27->streamlit==1.41.1) (3.4.4)
+Requirement already satisfied: idna<4,>=2.5 in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (from requests<3,>=2.27->streamlit==1.41.1) (3.11)
+Requirement already satisfied: urllib3<3,>=1.21.1 in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (from requests<3,>=2.27->streamlit==1.41.1) (2.5.0)
+Requirement already satisfied: certifi>=2017.4.17 in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (from requests<3,>=2.27->streamlit==1.41.1) (2025.11.12)
+Collecting markdown-it-py>=2.2.0 (from rich<14,>=10.14.0->streamlit==1.41.1)
+  Downloading markdown_it_py-4.0.0-py3-none-any.whl.metadata (7.3 kB)
+Requirement already satisfied: pygments<3.0.0,>=2.13.0 in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (from rich<14,>=10.14.0->streamlit==1.41.1) (2.19.2)
+Requirement already satisfied: anyio<5,>=3.5.0 in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (from anthropic) (4.11.0)
+Requirement already satisfied: distro<2,>=1.7.0 in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (from anthropic) (1.9.0)
+Requirement already satisfied: docstring-parser<1,>=0.15 in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (from anthropic) (0.17.0)
+Requirement already satisfied: httpx<1,>=0.25.0 in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (from anthropic) (0.28.1)
+Requirement already satisfied: jiter<1,>=0.4.0 in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (from anthropic) (0.12.0)
+Requirement already satisfied: pydantic<3,>=1.9.0 in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (from anthropic) (2.12.4)
+Requirement already satisfied: sniffio in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (from anthropic) (1.3.1)
+Requirement already satisfied: httpcore==1.* in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (from httpx<1,>=0.25.0->anthropic) (1.0.9)
+Requirement already satisfied: h11>=0.16 in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (from httpcore==1.*->httpx<1,>=0.25.0->anthropic) (0.16.0)
+Requirement already satisfied: annotated-types>=0.6.0 in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (from pydantic<3,>=1.9.0->anthropic) (0.7.0)
+Requirement already satisfied: pydantic-core==2.41.5 in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (from pydantic<3,>=1.9.0->anthropic) (2.41.5)
+Requirement already satisfied: typing-inspection>=0.4.2 in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (from pydantic<3,>=1.9.0->anthropic) (0.4.2)
+Requirement already satisfied: MarkupSafe>=2.0 in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (from jinja2->altair<6,>=4.0->streamlit==1.41.1) (3.0.3)
+Requirement already satisfied: attrs>=22.2.0 in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (from jsonschema>=3.0->altair<6,>=4.0->streamlit==1.41.1) (25.4.0)
+Requirement already satisfied: jsonschema-specifications>=2023.03.6 in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (from jsonschema>=3.0->altair<6,>=4.0->streamlit==1.41.1) (2025.9.1)
+Requirement already satisfied: referencing>=0.28.4 in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (from jsonschema>=3.0->altair<6,>=4.0->streamlit==1.41.1) (0.37.0)
+Requirement already satisfied: rpds-py>=0.7.1 in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (from jsonschema>=3.0->altair<6,>=4.0->streamlit==1.41.1) (0.28.0)
+Collecting mdurl~=0.1 (from markdown-it-py>=2.2.0->rich<14,>=10.14.0->streamlit==1.41.1)
+  Downloading mdurl-0.1.2-py3-none-any.whl.metadata (1.6 kB)
+Requirement already satisfied: six>=1.5 in c:\users\zero\desktop\veterinary-transcription\venv\lib\site-packages (from python-dateutil>=2.8.2->pandas==2.2.3) (1.17.0)
+Downloading streamlit-1.41.1-py2.py3-none-any.whl (9.1 MB)
+   ---------------------------------------- 9.1/9.1 MB 22.7 MB/s  0:00:00
+Downloading pandas-2.2.3-cp312-cp312-win_amd64.whl (11.5 MB)
+   ---------------------------------------- 11.5/11.5 MB 48.0 MB/s  0:00:00
+Downloading python_dotenv-1.0.1-py3-none-any.whl (19 kB)
+Using cached tqdm-4.67.1-py3-none-any.whl (78 kB)
+Downloading cachetools-5.5.2-py3-none-any.whl (10 kB)
+Downloading packaging-24.2-py3-none-any.whl (65 kB)
+Downloading pillow-11.3.0-cp312-cp312-win_amd64.whl (7.0 MB)
+   ---------------------------------------- 7.0/7.0 MB 48.0 MB/s  0:00:00
+Downloading protobuf-5.29.5-cp310-abi3-win_amd64.whl (434 kB)
+Downloading rich-13.9.4-py3-none-any.whl (242 kB)
+Downloading anthropic-0.73.0-py3-none-any.whl (367 kB)
+Downloading markdown_it_py-4.0.0-py3-none-any.whl (87 kB)
+Downloading mdurl-0.1.2-py3-none-any.whl (10.0 kB)
+Installing collected packages: tqdm, python-dotenv, protobuf, pillow, packaging, mdurl, cachetools, pandas, markdown-it-py, rich, anthropic, streamlit
+  Attempting uninstall: tqdm
+    Found existing installation: tqdm 4.66.1
+    Uninstalling tqdm-4.66.1:
+      Successfully uninstalled tqdm-4.66.1
+  Attempting uninstall: python-dotenv
+    Found existing installation: python-dotenv 1.0.0
+    Uninstalling python-dotenv-1.0.0:
+      Successfully uninstalled python-dotenv-1.0.0
+  Attempting uninstall: protobuf
+    Found existing installation: protobuf 6.33.1
+    Uninstalling protobuf-6.33.1:
+      Successfully uninstalled protobuf-6.33.1
+  Attempting uninstall: pillow
+    Found existing installation: pillow 12.0.0
+    Uninstalling pillow-12.0.0:
+      Successfully uninstalled pillow-12.0.0
+  Attempting uninstall: packaging
+    Found existing installation: packaging 25.0
+    Uninstalling packaging-25.0:
+      Successfully uninstalled packaging-25.0
+  Attempting uninstall: cachetools
+    Found existing installation: cachetools 6.2.2
+    Uninstalling cachetools-6.2.2:
+      Successfully uninstalled cachetools-6.2.2
+  Attempting uninstall: pandas
+    Found existing installation: pandas 2.2.0
+    Uninstalling pandas-2.2.0:
+      Successfully uninstalled pandas-2.2.0
+  Attempting uninstall: anthropic
+    Found existing installation: anthropic 0.72.1
+    Uninstalling anthropic-0.72.1:
+      Successfully uninstalled anthropic-0.72.1
+  Attempting uninstall: streamlit
+    Found existing installation: streamlit 1.51.0
+    Uninstalling streamlit-1.51.0:
+

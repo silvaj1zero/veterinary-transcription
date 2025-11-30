@@ -932,8 +932,53 @@ elif menu == "📋 Histórico":
 elif menu == "⚙️ Configurações":
     st.markdown('<p class="main-header">⚙️ Configurações do Sistema</p>', unsafe_allow_html=True)
 
+    # Configurações de Provedores (Admin)
+    st.subheader("🛠️ Configuração de Provedores (Admin)")
+    
+    col_prov1, col_prov2 = st.columns(2)
+    
+    with col_prov1:
+        transcription_options = {
+            "openai_whisper": "OpenAI Whisper (Local)",
+            "google_gemini": "Google Gemini (Nuvem)"
+        }
+        
+        selected_transcription = st.selectbox(
+            "Provedor de Transcrição",
+            options=list(transcription_options.keys()),
+            format_func=lambda x: transcription_options[x],
+            index=list(transcription_options.keys()).index(config.TRANSCRIPTION_PROVIDER)
+        )
+        
+        if selected_transcription != config.TRANSCRIPTION_PROVIDER:
+            config.TRANSCRIPTION_PROVIDER = selected_transcription
+            st.success(f"✅ Provedor de Transcrição alterado para: {transcription_options[selected_transcription]}")
+            # Limpar cache para forçar recarregamento de serviços se necessário
+            st.cache_resource.clear()
+
+    with col_prov2:
+        llm_options = {
+            "anthropic_claude": "Anthropic Claude (Sonnet)",
+            "google_gemini": "Google Gemini (Pro)"
+        }
+        
+        selected_llm = st.selectbox(
+            "Provedor de IA (LLM)",
+            options=list(llm_options.keys()),
+            format_func=lambda x: llm_options[x],
+            index=list(llm_options.keys()).index(config.LLM_PROVIDER)
+        )
+        
+        if selected_llm != config.LLM_PROVIDER:
+            config.LLM_PROVIDER = selected_llm
+            st.success(f"✅ Provedor de IA alterado para: {llm_options[selected_llm]}")
+            # Limpar cache para forçar recarregamento de serviços se necessário
+            st.cache_resource.clear()
+
+    st.markdown("---")
+
     # Configurações do Whisper
-    st.subheader("🎤 Whisper AI")
+    st.subheader("🎤 Configuração Whisper (se usado)")
 
     current_model = config.WHISPER_MODEL
 
@@ -956,7 +1001,7 @@ elif menu == "⚙️ Configurações":
 
     if selected_model != current_model:
         if st.button("💾 Salvar Configuração"):
-            st.warning("⚠️ Para alterar o modelo, edite o arquivo config.py manualmente.")
+            st.warning("⚠️ Para alterar o modelo permanentemente, edite o arquivo config.py ou .env.")
 
     st.markdown("---")
 
