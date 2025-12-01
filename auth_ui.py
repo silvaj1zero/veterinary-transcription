@@ -3,6 +3,7 @@ Componentes de UI para autenticação
 """
 
 import streamlit as st
+import pandas as pd
 from auth import AuthManager
 import logging
 
