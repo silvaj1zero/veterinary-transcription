@@ -21,11 +21,15 @@ audios/*.ogg
 audios/*.flac
 transcricoes/
 relatorios/
+data/*.db
+data/*.sqlite
+data/*.sqlite3
 
 # Manter estrutura de pastas mas ignorar conteúdo
 !audios/.gitkeep
 !transcricoes/.gitkeep
 !relatorios/.gitkeep
+!data/.gitkeep
 
 # Logs
 *.log
