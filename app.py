@@ -23,11 +23,19 @@ from services import StatsService, ReportService
 from converters import convert_md_to_txt
 from pdf_converter import convert_md_to_pdf
 import anthropic
-from auth import AuthManager
-from auth_ui import show_login_page, show_user_menu, show_user_management, show_change_password
-
-# Carregar variáveis de ambiente
+# Carregar variáveis de ambiente ANTES de importar auth
 load_dotenv()
+
+# Importar AuthManager baseado em DATABASE_PROVIDER
+import config
+if config.DATABASE_PROVIDER == "supabase":
+    from auth_supabase import SupabaseAuthManager as AuthManager
+    logging.info("🔄 Usando Supabase para autenticação")
+else:
+    from auth import AuthManager
+    logging.info("🔄 Usando SQLite para autenticação")
+
+from auth_ui import show_login_page, show_user_menu, show_user_management, show_change_password
 
 # Configurar logging para Streamlit
 logging.basicConfig(
@@ -50,7 +58,7 @@ except EnvironmentError as e:
     st.info("Por favor, instale o FFmpeg e tente novamente.")
 
 # Importar sistema
-import config
+# config já foi importado acima para verificar DATABASE_PROVIDER
 from transcribe_consult import VeterinaryTranscription
 
 # Configuração da página
