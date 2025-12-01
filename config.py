@@ -40,4 +40,13 @@ AUDIO_EXTENSIONS = ['.mp3', '.wav', '.m4a', '.ogg', '.flac']
 DEFAULT_LANGUAGE = "pt"
 
 # Template do prompt
+# Template do prompt
 PROMPT_TEMPLATE_FILE = TEMPLATE_DIR / "prompt_veterinario.txt"
+
+# Supabase Configuration
+SUPABASE_URL = os.getenv("SUPABASE_URL", "")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY", "")  # anon/public key
+SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_KEY", "")  # service_role key (admin)
+
+# Database Provider: "sqlite" (local) ou "supabase" (cloud)
+DATABASE_PROVIDER = os.getenv("DATABASE_PROVIDER", "sqlite")
