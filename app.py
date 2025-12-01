@@ -217,6 +217,45 @@ with st.sidebar:
     )
 
     st.markdown("---")
+    
+    # Configurações de IA (Expander)
+    with st.expander("🤖 Configurações de IA", expanded=False):
+        # Seleção de Provedor de Transcrição
+        transcription_provider = st.radio(
+            "🎙️ Transcrição",
+            ["OpenAI Whisper (Local)", "Google Gemini (Nuvem)"],
+            index=0 if config.TRANSCRIPTION_PROVIDER == "openai_whisper" else 1,
+            help="Whisper: Roda no seu PC (grátis, offline). Gemini: Roda na nuvem (rápido, requer chave)."
+        )
+        
+        # Atualizar config
+        new_transcription_provider = "openai_whisper" if "Whisper" in transcription_provider else "google_gemini"
+        if new_transcription_provider != config.TRANSCRIPTION_PROVIDER:
+            config.TRANSCRIPTION_PROVIDER = new_transcription_provider
+            st.toast(f"Provedor de transcrição alterado para: {new_transcription_provider}")
+
+        st.markdown("---")
+
+        # Seleção de Provedor de LLM (Relatório)
+        llm_provider = st.radio(
+            "🧠 Inteligência (Relatório)",
+            ["Anthropic Claude 3.5", "Google Gemini 1.5 Pro"],
+            index=0 if config.LLM_PROVIDER == "anthropic_claude" else 1,
+            help="Claude: Melhor raciocínio clínico. Gemini: Janela de contexto maior."
+        )
+
+        # Atualizar config
+        new_llm_provider = "anthropic_claude" if "Claude" in llm_provider else "google_gemini"
+        if new_llm_provider != config.LLM_PROVIDER:
+            config.LLM_PROVIDER = new_llm_provider
+            st.toast(f"Provedor de LLM alterado para: {new_llm_provider}")
+            
+        # Verificar API Keys
+        if new_transcription_provider == "google_gemini" or new_llm_provider == "google_gemini":
+            if not config.GOOGLE_API_KEY:
+                st.error("⚠️ GOOGLE_API_KEY não encontrada no .env!")
+
+    st.markdown("---")
 
     # Estatísticas resumidas na sidebar
     stats = get_stats()
