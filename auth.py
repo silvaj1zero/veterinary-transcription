@@ -226,36 +226,51 @@ class AuthManager:
         conn.close()
         return users
     
-    def update_user(self, user_id: int, **kwargs) -> bool:
-        """Atualizar dados do usuário"""
+    def update_user(self, user_identifier, **kwargs) -> bool:
+        """Atualizar dados do usuário (aceita user_id ou username)"""
         try:
             conn = sqlite3.connect(self.db_path)
             cursor = conn.cursor()
-            
+
+            # Determinar se é username ou user_id
+            if isinstance(user_identifier, str):
+                # É username - buscar ID
+                cursor.execute("SELECT id FROM users WHERE username = ?", (user_identifier,))
+                result = cursor.fetchone()
+                if not result:
+                    logger.warning(f"Usuário não encontrado: {user_identifier}")
+                    conn.close()
+                    return False
+                user_id = result[0]
+            else:
+                # É user_id direto
+                user_id = user_identifier
+
             allowed_fields = ['full_name', 'email', 'role', 'is_active']
             updates = []
             values = []
-            
+
             for field, value in kwargs.items():
                 if field in allowed_fields:
                     updates.append(f"{field} = ?")
                     values.append(value)
-            
+
             if not updates:
+                conn.close()
                 return False
-            
+
             values.append(user_id)
             query = f"UPDATE users SET {', '.join(updates)} WHERE id = ?"
-            
+
             cursor.execute(query, values)
             conn.commit()
             conn.close()
-            
-            logger.info(f"Usuário {user_id} atualizado")
+
+            logger.info(f"Usuário {user_identifier} atualizado")
             return True
-            
+
         except Exception as e:
-            logger.error(f"Erro ao atualizar usuário {user_id}: {e}")
+            logger.error(f"Erro ao atualizar usuário {user_identifier}: {e}")
             return False
     
     def change_password(self, username: str, old_password: str, new_password: str) -> bool:
