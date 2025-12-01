@@ -23,6 +23,8 @@ from services import StatsService, ReportService
 from converters import convert_md_to_txt
 from pdf_converter import convert_md_to_pdf
 import anthropic
+from auth import AuthManager
+from auth_ui import show_login_page, show_user_menu, show_user_management, show_change_password
 
 # Carregar variáveis de ambiente
 load_dotenv()
@@ -157,6 +159,25 @@ def get_recent_reports(limit=10):
 
     return result
 
+
+# ==================== AUTHENTICATION ====================
+# Inicializar sistema de autenticação
+auth_manager = AuthManager()
+
+# Verificar autenticação
+if 'authenticated' not in st.session_state:
+    st.session_state['authenticated'] = False
+    st.session_state['user'] = None
+
+# Se não estiver autenticado, mostrar página de login
+if not st.session_state['authenticated']:
+    show_login_page(auth_manager)
+    st.stop()
+
+# Usuário autenticado - continuar com a aplicação
+current_user = st.session_state['user']
+# ========================================================
+
 # Sidebar
 with st.sidebar:
     logo_path = Path(__file__).parent / "badi_logo.png"
@@ -168,9 +189,15 @@ with st.sidebar:
     st.markdown("---")
 
     # Menu de navegação
+    menu_options = ["📊 Dashboard", "➕ Nova Consulta", "📋 Histórico", "⚙️ Configurações"]
+    
+    # Adicionar opção de gerenciamento de usuários para admins
+    if current_user['role'] == 'admin':
+        menu_options.append("👥 Usuários")
+    
     menu = st.radio(
         "Navegação",
-        ["📊 Dashboard", "➕ Nova Consulta", "📋 Histórico", "⚙️ Configurações"],
+        menu_options,
         label_visibility="collapsed"
     )
 
@@ -182,8 +209,11 @@ with st.sidebar:
     st.metric("Total de Relatórios", stats['total_relatorios'])
     st.metric("Custo Hoje", f"${stats['custo_hoje']:.2f}")
 
+    # Informações do usuário e botão de logout
+    show_user_menu(current_user)
+    
     st.markdown("---")
-    st.caption("v1.6 - Resumo para Tutor & UX")
+    st.caption("v1.7 - Auth System")
 
 # Conteúdo principal
 if menu == "📊 Dashboard":
@@ -953,6 +983,10 @@ elif menu == "📋 Histórico":
 
 elif menu == "⚙️ Configurações":
     st.markdown('<p class="main-header">⚙️ Configurações do Sistema</p>', unsafe_allow_html=True)
+
+elif menu == "👥 Usuários":
+    show_user_management(auth_manager, current_user)
+
 
     # Configurações de Provedores (Admin)
     st.subheader("🛠️ Configuração de Provedores (Admin)")
