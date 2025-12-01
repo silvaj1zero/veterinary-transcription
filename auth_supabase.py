@@ -165,7 +165,7 @@ class SupabaseAuthManager:
             logger.error(f"Erro ao listar usuários: {e}")
             return []
 
-    def create_user(self, email, password, full_name, role="user", created_by=None):
+    def create_user(self, username, password, full_name, email=None, role="user", created_by=None):
         """Criar novo usuário (apenas admin)"""
         try:
             if not config.SUPABASE_SERVICE_KEY:
@@ -174,9 +174,12 @@ class SupabaseAuthManager:
                 
             admin_client = create_client(config.SUPABASE_URL, config.SUPABASE_SERVICE_KEY)
             
+            # Se email não fornecido, usar username como email (ou criar email fictício)
+            user_email = email if email else (username if "@" in username else f"{username}@badilab.local")
+            
             # Criar usuário no Auth
             response = admin_client.auth.admin.create_user({
-                "email": email,
+                "email": user_email,
                 "password": password,
                 "email_confirm": True,
                 "user_metadata": {
@@ -191,7 +194,7 @@ class SupabaseAuthManager:
                 return True
             return False
         except Exception as e:
-            logger.error(f"Erro ao criar usuário {email}: {e}")
+            logger.error(f"Erro ao criar usuário {username}: {e}")
             return False
 
     def update_user(self, user_id, **kwargs):
@@ -232,4 +235,51 @@ class SupabaseAuthManager:
             return True
         except Exception as e:
             logger.error(f"Erro ao alterar senha: {e}")
+            return False
+
+    def get_login_history(self, limit=100):
+        """Buscar histórico de tentativas de login"""
+        try:
+            response = self.supabase.table("login_attempts").select("*").order("timestamp", desc=True).limit(limit).execute()
+            
+            # Converter para formato compatível com auth_ui
+            history = []
+            for attempt in response.data:
+                history.append({
+                    "timestamp": attempt["timestamp"],
+                    "username": attempt["email"],
+                    "success": attempt["success"],
+                    "ip_address": attempt.get("ip_address", "unknown")
+                })
+            return history
+        except Exception as e:
+            logger.error(f"Erro ao buscar histórico de login: {e}")
+            return []
+
+    def user_exists(self, username):
+        """Verificar se usuário existe (por email)"""
+        try:
+            if not config.SUPABASE_SERVICE_KEY:
+                return False
+                
+            admin_client = create_client(config.SUPABASE_URL, config.SUPABASE_SERVICE_KEY)
+            
+            # Buscar por email (username é tratado como email no Supabase)
+            email = username if "@" in username else f"{username}@example.com"
+            
+            # Verificar na tabela de perfis
+            response = admin_client.table("user_profiles").select("user_id").execute()
+            
+            # Buscar todos os usuários e verificar emails
+            for profile in response.data:
+                try:
+                    user = admin_client.auth.admin.get_user_by_id(profile["user_id"])
+                    if user.user.email == email or user.user.email.split("@")[0] == username:
+                        return True
+                except:
+                    continue
+                    
+            return False
+        except Exception as e:
+            logger.error(f"Erro ao verificar existência de usuário: {e}")
             return False

@@ -121,8 +121,8 @@ def show_user_management(auth_manager: AuthManager, current_user: dict):
                         st.write(f"**Status:** {'Ativo' if user['is_active'] else 'Inativo'}")
                     
                     with col2:
-                        st.write(f"**Criado em:** {user['created_at'][:10]}")
-                        st.write(f"**Último login:** {user['last_login'][:10] if user['last_login'] else 'Nunca'}")
+                        st.write(f"**Criado em:** {str(user['created_at'])[:10]}")
+                        st.write(f"**Último login:** {str(user['last_login'])[:10] if user['last_login'] else 'Nunca'}")
                     
                     st.markdown("---")
                     
