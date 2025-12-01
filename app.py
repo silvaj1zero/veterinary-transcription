@@ -213,7 +213,7 @@ with st.sidebar:
     show_user_menu(current_user)
     
     st.markdown("---")
-    st.caption("v1.7 - Auth System")
+    st.caption("v1.8 - Auth + Supabase Ready")
 
 # Conteúdo principal
 if menu == "📊 Dashboard":
