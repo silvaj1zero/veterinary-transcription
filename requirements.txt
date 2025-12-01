@@ -6,6 +6,10 @@ tqdm==4.67.1  # Updated version
 pydub==0.25.1
 google-generativeai>=0.3.0
 
+# Database - Supabase
+supabase>=2.0.0  # PostgreSQL cloud database with auth
+psycopg2-binary>=2.9.9  # PostgreSQL adapter (fallback for direct connections)
+
 # Web interface dependencies
 streamlit==1.41.1  # Updated from 1.51.0 for security and stability
 pandas==2.2.3  # Updated for security patches

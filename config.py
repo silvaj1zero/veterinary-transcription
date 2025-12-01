@@ -24,6 +24,14 @@ WHISPER_MODEL = os.getenv("WHISPER_MODEL", "base")  # Permite override via env v
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
 
+# Supabase Configuration
+SUPABASE_URL = os.getenv("SUPABASE_URL", "")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY", "")  # anon/public key
+SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_KEY", "")  # service_role key (admin)
+
+# Database Provider: "sqlite" (local) ou "supabase" (cloud)
+DATABASE_PROVIDER = os.getenv("DATABASE_PROVIDER", "sqlite")
+
 # Configuração de Provedores
 # Opções: "openai_whisper" (local), "google_gemini" (nuvem)
 TRANSCRIPTION_PROVIDER = os.getenv("TRANSCRIPTION_PROVIDER", "openai_whisper")
