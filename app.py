@@ -15,6 +15,10 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from dotenv import load_dotenv
+
+# Carregar variáveis de ambiente IMEDIATAMENTE antes de qualquer import local
+load_dotenv()
+
 import json
 import re
 
@@ -23,11 +27,22 @@ from services import StatsService, ReportService
 from converters import convert_md_to_txt
 from pdf_converter import convert_md_to_pdf
 import anthropic
-from auth import AuthManager
-from auth_ui import show_login_page, show_user_menu, show_user_management, show_change_password
+import config
 
-# Carregar variáveis de ambiente
-load_dotenv()
+# Seleção dinâmica do provedor de autenticação
+# Agora config.DATABASE_PROVIDER terá o valor correto pois load_dotenv já rodou
+if config.DATABASE_PROVIDER == "supabase":
+    try:
+        from auth_supabase import SupabaseAuthManager as AuthManager
+        logging.info("🔄 Usando Supabase para autenticação")
+    except ImportError as e:
+        logging.error(f"Erro ao importar SupabaseAuthManager: {e}. Revertendo para SQLite.")
+        from auth import AuthManager
+else:
+    from auth import AuthManager
+    logging.info("🔄 Usando SQLite para autenticação")
+
+from auth_ui import show_login_page, show_user_menu, show_user_management, show_change_password
 
 # Configurar logging para Streamlit
 logging.basicConfig(
@@ -658,23 +673,6 @@ elif menu == "➕ Nova Consulta":
                             error_msg = f"Erro inesperado ao processar: {str(e)}"
                             logging.error(f"Unexpected error processing consultation: {e}", exc_info=True)
                             st.error(f"❌ {error_msg}")
-                            st.info("💡 Verifique o log (veterinary_system_web.log) para mais detalhes.")
-
-    # Mostrar resultado
-    if st.session_state.get('show_result') and st.session_state.get('last_report'):
-        st.markdown("---")
-        st.markdown("""
-        <div class="success-box">
-        <h3>✅ Relatório Gerado com Sucesso!</h3>
-        </div>
-        """, unsafe_allow_html=True)
-
-        report_path = st.session_state['last_report']
-
-        st.markdown("")
-        col1, col2, col3 = st.columns(3)
-
-        with col1:
             st.metric("📄 Arquivo", report_path.name)
         with col2:
             st.metric("📁 Local", "relatorios/")
