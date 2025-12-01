@@ -673,6 +673,21 @@ elif menu == "➕ Nova Consulta":
                             error_msg = f"Erro inesperado ao processar: {str(e)}"
                             logging.error(f"Unexpected error processing consultation: {e}", exc_info=True)
                             st.error(f"❌ {error_msg}")
+    # Mostrar resultado
+    if st.session_state.get('show_result') and st.session_state.get('last_report'):
+        st.markdown("---")
+        st.markdown("""
+        <div class="success-box">
+        <h3>✅ Relatório Gerado com Sucesso!</h3>
+        </div>
+        """, unsafe_allow_html=True)
+
+        report_path = st.session_state['last_report']
+
+        st.markdown("")
+        col1, col2, col3 = st.columns(3)
+
+        with col1:
             st.metric("📄 Arquivo", report_path.name)
         with col2:
             st.metric("📁 Local", "relatorios/")
