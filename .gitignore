@@ -22,6 +22,9 @@ audios/*.flac
 transcricoes/
 relatorios/
 
+# Banco de dados de usuários (dados sensíveis)
+data/
+
 # Manter estrutura de pastas mas ignorar conteúdo
 !audios/.gitkeep
 !transcricoes/.gitkeep
