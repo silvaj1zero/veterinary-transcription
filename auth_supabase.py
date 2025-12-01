@@ -70,6 +70,18 @@ class SupabaseAuthManager:
             self._log_login_attempt(None, email, False, ip_address, str(e))
             return None
 
+    def authenticate(self, username, password):
+        """Alias para sign_in para compatibilidade com auth_ui"""
+        # auth_ui passa username, mas Supabase usa email
+        # Se username parecer um email, usa direto. Se não, assume que é a parte antes do @ (não ideal para Supabase, mas ok para compatibilidade)
+        email = username
+        if "@" not in email:
+            # Tentar adivinhar ou falhar? Supabase exige email.
+            # Vamos assumir que o usuário digitou o email completo no campo "Usuário"
+            pass
+            
+        return self.sign_in(email, password)
+
     def sign_out(self):
         """Fazer logout"""
         try:

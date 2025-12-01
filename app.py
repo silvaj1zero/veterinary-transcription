@@ -1226,4 +1226,4 @@ elif menu == "👥 Usuários":
 
 # Footer
 st.markdown("---")
-st.caption("🏥 Sistema de Documentação Veterinária v1.8 | Desenvolvido por BadiLab | Powered by Streamlit, Whisper AI & Claude API")
+st.caption("🏥 Sistema de Documentação Veterinária v1.9 | Desenvolvido por BadiLab | Powered by Streamlit, Whisper, Claude & Gemini")

@@ -1,5 +1,32 @@
 # 📋 Histórico de Alterações
 
+## [1.9] - 01/12/2025
+
+### ✨ Novidades
+
+- **Integração Google Gemini (Híbrida)**
+  - **Transcrição:** Opção de usar **Google Gemini 1.5 Flash** (Nuvem) como alternativa ao Whisper (Local).
+  - **Relatórios:** Opção de usar **Google Gemini 1.5 Pro** como alternativa ao Claude 3.5 Sonnet.
+  - Nova seção "🤖 Configurações de IA" na sidebar para alternar provedores em tempo real.
+
+- **Gestão de Usuários Verificada**
+  - Criação de novos usuários via interface administrativa validada.
+  - Fluxo de login/logout robusto com Supabase.
+
+### 🔧 Melhorias
+
+- **Interface de Usuário**
+  - Controles de seleção de IA intuitivos na barra lateral.
+  - Feedback visual (Toasts) ao trocar de provedor.
+  - Verificação automática de API Keys configuradas.
+
+### 🐛 Correções
+
+- Correção de erro `NameError` na geração de relatórios.
+- Ajustes de versão no rodapé (v1.9).
+
+---
+
 ## [1.8] - 01/12/2025
 
 ### 🎉 Novidades

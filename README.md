@@ -213,6 +213,20 @@ WHISPER_MODEL = "medium"  # Altere aqui
 
 **Recomendação:** Use `medium` para português. Oferece o melhor custo-benefício.
 
+**Recomendação:** Use `medium` para português. Oferece o melhor custo-benefício.
+
+### Configurações de IA (Novo na v1.9)
+
+Agora você pode escolher os provedores de inteligência artificial diretamente na sidebar:
+
+1.  **Transcrição:**
+    *   **OpenAI Whisper (Local):** Gratuito, roda no seu PC, funciona offline.
+    *   **Google Gemini (Nuvem):** Rápido, requer chave de API (`GOOGLE_API_KEY`), processamento na nuvem.
+
+2.  **Relatório (LLM):**
+    *   **Anthropic Claude 3.5:** Recomendado para raciocínio clínico complexo.
+    *   **Google Gemini 1.5 Pro:** Janela de contexto maior, alternativa robusta.
+
 ---
 
 ## 🔧 Troubleshooting
