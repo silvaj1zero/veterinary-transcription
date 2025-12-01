@@ -1066,6 +1066,55 @@ elif menu == "📋 Histórico":
             if readme_path.exists():
                 with open(readme_path, 'r', encoding='utf-8') as f:
                     st.markdown(f.read())
+        else:
+            st.info("Nenhuma consulta encontrada com os filtros aplicados.")
+
+elif menu == "⚙️ Configurações":
+    st.markdown('<p class="main-header">⚙️ Configurações do Sistema</p>', unsafe_allow_html=True)
+    
+    st.subheader("📊 Informações do Sistema")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.metric("Python", f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}")
+        st.metric("Streamlit", st.__version__)
+        st.metric("Modelo Whisper", config.WHISPER_MODEL)
+    
+    with col2:
+        st.metric("API Claude", "Configurada ✅" if config.ANTHROPIC_API_KEY else "Não configurada ❌")
+        st.metric("API Google", "Configurada ✅" if config.GOOGLE_API_KEY else "Não configurada ❌")
+        st.metric("Database", "Supabase ✅" if config.DATABASE_PROVIDER == "supabase" else "SQLite")
+    
+    st.markdown("---")
+    
+    st.subheader("ℹ️ Sobre")
+    
+    st.markdown("""
+    **Sistema de Documentação de Consultas Veterinárias**
+    
+    - **Versão:** 1.9 - Gemini Integration & User Management
+    - **Desenvolvido por:** BadiLab
+    - **Data:** Dezembro 2025
+    
+    **Funcionalidades:**
+    - ✅ Transcrição automática (Whisper AI ou Google Gemini)
+    - ✅ Geração de relatórios estruturados (Claude ou Gemini)
+    - ✅ Sistema de autenticação com Supabase
+    - ✅ Gerenciamento de usuários (Admin)
+    - ✅ Dashboard com estatísticas
+    - ✅ Histórico de consultas
+    - ✅ Exportação PDF com Unicode completo
+    
+    **Changelog v1.9:**
+    - 🤖 **Integração Google Gemini:** Alternativa para transcrição e LLM
+    - 👥 **Gestão de Usuários:** Criação e gerenciamento via interface
+    - 🔐 **Autenticação Supabase:** Sistema robusto de login/logout
+    - ⚙️ **Configurações de IA:** Seleção de provedores na sidebar
+    """)
+
+elif menu == "👥 Usuários":
+    show_user_management(auth_manager, current_user)
 
 # Footer
 st.markdown("---")
