@@ -46,14 +46,27 @@ class GeminiTranscriptionService(TranscriptionService):
             raise ValueError("GOOGLE_API_KEY não configurada")
         genai.configure(api_key=api_key)
         self.model = genai.GenerativeModel(config.GEMINI_MODEL_FLASH)
+    
+    def _get_mime_type(self, audio_path: Path) -> str:
+        """Detecta MIME type baseado na extensão do arquivo"""
+        mime_types = {
+            '.mp3': 'audio/mpeg',
+            '.wav': 'audio/wav',
+            '.m4a': 'audio/mp4',  # M4A usa MIME type audio/mp4
+            '.ogg': 'audio/ogg',
+            '.flac': 'audio/flac'
+        }
+        ext = audio_path.suffix.lower()
+        return mime_types.get(ext, 'audio/mpeg')  # Default para mp3
 
     def transcribe(self, audio_path: Path) -> dict:
         logging.info(f"Iniciando transcrição Gemini: {audio_path.name}")
         
         try:
-            # Upload do arquivo para o Gemini
-            logging.info("Fazendo upload do áudio para o Gemini...")
-            audio_file = genai.upload_file(path=audio_path)
+            # Upload do arquivo para o Gemini com MIME type explícito
+            mime_type = self._get_mime_type(audio_path)
+            logging.info(f"Fazendo upload do áudio para o Gemini (MIME: {mime_type})...")
+            audio_file = genai.upload_file(path=audio_path, mime_type=mime_type)
             
             # Prompt para transcrição
             prompt = "Transcreva este áudio de consulta veterinária fielmente em português."

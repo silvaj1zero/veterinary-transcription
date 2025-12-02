@@ -425,8 +425,8 @@ elif menu == "➕ Nova Consulta":
         st.markdown("""
         <div class="info-box">
         <strong>ℹ️ Processamento de Áudio</strong><br>
-        Upload de arquivo de áudio para transcrição automática com Whisper AI.<br>
-        <strong>Tempo estimado:</strong> 5-10 minutos
+        Upload de arquivo de áudio para transcrição automática com Whisper AI ou Google Gemini.<br>
+        <strong>⏱️ Tempo estimado:</strong> 5-10 minutos
         </div>
         """, unsafe_allow_html=True)
 
@@ -456,8 +456,8 @@ elif menu == "➕ Nova Consulta":
         <div class="info-box">
         <strong>ℹ️ Transcrição Existente (Modo Rápido)</strong><br>
         Cole ou digite o texto da consulta diretamente.<br>
-        <strong>Tempo estimado:</strong> 30 segundos ⚡<br>
-        <strong>Economia:</strong> 70% mais rápido | 37% mais barato
+        <strong>⏱️ Tempo estimado:</strong> 30 segundos ⚡<br>
+        <strong>💰 Economia:</strong> 70% mais rápido | 37% mais barato
         </div>
         """, unsafe_allow_html=True)
 
@@ -650,9 +650,15 @@ elif menu == "➕ Nova Consulta":
                     logging.warning(f"Validação falhou: {e}")
                     patient_info = None
 
+
                 if patient_info:
-                    # Processar
-                    with st.spinner("🔄 Processando consulta..."):
+                    # Criar placeholders para progresso
+                    progress_container = st.container()
+                    
+                    with progress_container:
+                        progress_bar = st.progress(0)
+                        status_text = st.empty()
+                        
                         try:
                             # Verificar API key antes de processar
                             if not config.ANTHROPIC_API_KEY:
@@ -660,21 +666,52 @@ elif menu == "➕ Nova Consulta":
                                 logging.error("ANTHROPIC_API_KEY não encontrada")
                                 patient_info = None
                             else:
+                                # Etapa 1: Inicialização
+                                progress_bar.progress(0.1)
+                                status_text.info("⚙️ Inicializando sistema...")
+                                
                                 # Inicializar sistema
                                 if st.session_state.get('processing_mode') == 'audio':
+                                    # Modo áudio - processo mais longo
+                                    progress_bar.progress(0.2)
+                                    status_text.info("📤 Preparando upload do áudio...")
+                                    
                                     system = VeterinaryTranscription(load_whisper=True)
+                                    
+                                    # Etapa 2: Transcrição (processo demorado)
+                                    progress_bar.progress(0.3)
+                                    status_text.warning("🎤 Transcrevendo áudio... ⏱️ **Tempo estimado: 5-10 minutos**\n\n*Por favor, aguarde. O processamento está em andamento.*")
+                                    
                                     report_path = system.process_consultation(
                                         st.session_state['audio_path'],
                                         patient_info
                                     )
-                                else:  # text
+                                    
+                                    # Etapa 3: Geração de relatório
+                                    progress_bar.progress(0.8)
+                                    status_text.info("📝 Gerando relatório médico...")
+                                    
+                                else:  # text mode
+                                    # Modo texto - processo rápido
+                                    progress_bar.progress(0.3)
+                                    status_text.info("📝 Processando transcrição...")
+                                    
                                     system = VeterinaryTranscription(load_whisper=False)
+                                    
+                                    # Etapa 2: Geração de relatório
+                                    progress_bar.progress(0.5)
+                                    status_text.info("🤖 Gerando relatório médico... ⏱️ **Tempo estimado: 30 segundos**")
+                                    
                                     report_path = system.process_from_text(
                                         st.session_state['transcription'],
                                         patient_info,
                                         source_name=f"{paciente_nome}_{motivo_retorno[:20]}"
                                     )
-
+                                
+                                # Etapa final: Conclusão
+                                progress_bar.progress(1.0)
+                                status_text.success("✅ Processamento concluído com sucesso!")
+                                
                                 st.session_state['last_report'] = report_path
                                 st.session_state['last_patient_info'] = patient_info  # Salvar para usar no resumo
                                 st.session_state['show_result'] = True
@@ -686,32 +723,49 @@ elif menu == "➕ Nova Consulta":
                                 if 'transcription' in st.session_state:
                                     del st.session_state['transcription']
 
+                                # Pequeno delay para mostrar sucesso antes de recarregar
+                                import time
+                                time.sleep(1.5)
+                                
                                 st.rerun()
 
                         except anthropic.RateLimitError as e:
+                            progress_bar.empty()
+                            status_text.empty()
                             error_msg = "Limite de requisições da API excedido. Por favor, aguarde alguns minutos antes de tentar novamente."
                             logging.error(f"Rate limit error: {e}")
                             st.error(f"❌ {error_msg}")
                         except anthropic.APIConnectionError as e:
+                            progress_bar.empty()
+                            status_text.empty()
                             error_msg = "Erro de conexão com a API Claude. Verifique sua conexão com a internet."
                             logging.error(f"API connection error: {e}")
                             st.error(f"❌ {error_msg}")
                         except anthropic.AuthenticationError as e:
+                            progress_bar.empty()
+                            status_text.empty()
                             error_msg = "Erro de autenticação. Verifique se sua ANTHROPIC_API_KEY está correta no arquivo .env"
                             logging.error(f"Authentication error: {e}")
                             st.error(f"❌ {error_msg}")
                         except FileNotFoundError as e:
+                            progress_bar.empty()
+                            status_text.empty()
                             error_msg = f"Arquivo não encontrado: {str(e)}"
                             logging.error(f"File not found: {e}")
                             st.error(f"❌ {error_msg}")
                         except ValueError as e:
+                            progress_bar.empty()
+                            status_text.empty()
                             error_msg = f"Erro de validação: {str(e)}"
                             logging.error(f"Validation error: {e}")
                             st.error(f"❌ {error_msg}")
                         except Exception as e:
+                            progress_bar.empty()
+                            status_text.empty()
                             error_msg = f"Erro inesperado ao processar: {str(e)}"
                             logging.error(f"Unexpected error processing consultation: {e}", exc_info=True)
                             st.error(f"❌ {error_msg}")
+
     # Mostrar resultado
     if st.session_state.get('show_result') and st.session_state.get('last_report'):
         st.markdown("---")
