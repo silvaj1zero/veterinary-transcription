@@ -70,44 +70,292 @@ from transcribe_consult import VeterinaryTranscription
 
 # Configuração da página
 st.set_page_config(
-    page_title="Sistema Veterinário",
-    page_icon="🏥",
+    page_title="BadiLab - Sistema Veterinário",
+    page_icon="🐾",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
-# CSS customizado
+# CSS customizado - Design moderno baseado no mockup
 st.markdown("""
 <style>
-    .main-header {
-        font-size: 2.5rem;
-        font-weight: bold;
-        color: #1f77b4;
-        text-align: center;
-        padding: 1rem 0;
+    /* Ocultar sidebar e elementos padrão do Streamlit */
+    [data-testid="stSidebar"] {
+        display: none;
     }
+
+    /* Header principal */
+    .main-header-nav {
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        padding: 1rem 2rem;
+        border-bottom: 1px solid #e0e0e0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: -5rem -5rem 2rem -5rem;
+        position: sticky;
+        top: 0;
+        z-index: 999;
+    }
+
+    .logo-container {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .logo-text {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #5B9A9E;
+        margin: 0;
+    }
+
+    /* Navegação horizontal */
+    .nav-tabs {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .nav-tab {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        color: #666;
+        text-decoration: none;
+        border: none;
+        background: transparent;
+    }
+
+    .nav-tab:hover {
+        background-color: #f0f7f8;
+        color: #5B9A9E;
+    }
+
+    .nav-tab.active {
+        background-color: #5B9A9E;
+        color: white;
+        box-shadow: 0 2px 8px rgba(91, 154, 158, 0.3);
+    }
+
+    /* User profile */
+    .user-profile {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.5rem 1rem;
+        background: #f8f9fa;
+        border-radius: 50px;
+        cursor: pointer;
+    }
+
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+    }
+
+    /* Cards e métricas */
     .metric-card {
-        background-color: #f0f2f6;
-        padding: 1rem;
-        border-radius: 0.5rem;
-        border-left: 4px solid #1f77b4;
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 1px solid #e0e0e0;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
     }
-    .success-box {
-        padding: 1rem;
-        border-radius: 0.5rem;
+
+    .metric-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        transform: translateY(-2px);
+    }
+
+    /* Status badges */
+    .status-badge {
+        padding: 0.35rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    .status-concluido {
         background-color: #d4edda;
-        border: 1px solid #c3e6cb;
         color: #155724;
     }
+
+    .status-em-progresso {
+        background-color: #cce5ff;
+        color: #004085;
+    }
+
+    .status-pendente {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+    /* Botões primários */
+    .stButton > button[kind="primary"] {
+        background: linear-gradient(135deg, #5B9A9E 0%, #4a7d81 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .stButton > button[kind="primary"]:hover {
+        box-shadow: 0 4px 12px rgba(91, 154, 158, 0.4);
+        transform: translateY(-2px);
+    }
+
+    /* Tabelas */
+    .dataframe {
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid #e0e0e0;
+    }
+
+    /* Títulos de página */
+    .page-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+    }
+
+    .page-subtitle {
+        font-size: 1rem;
+        color: #7f8c8d;
+        margin-bottom: 2rem;
+    }
+
+    /* Filtros */
+    .filter-container {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 1px solid #e0e0e0;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Success/Info boxes */
+    .success-box {
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        background-color: #d4edda;
+        border-left: 4px solid #28a745;
+        color: #155724;
+    }
+
     .info-box {
-        padding: 1rem;
-        border-radius: 0.5rem;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
         background-color: #d1ecf1;
-        border: 1px solid #bee5eb;
+        border-left: 4px solid #17a2b8;
         color: #0c5460;
+    }
+
+    /* Main content padding adjustment */
+    .block-container {
+        padding-top: 1rem;
     }
 </style>
 """, unsafe_allow_html=True)
+
+# ==================== HELPER FUNCTIONS ====================
+
+def render_header(current_user: dict, current_page: str):
+    """Renderizar header horizontal com navegação"""
+
+    # Obter iniciais do usuário para avatar
+    initials = "".join([word[0].upper() for word in current_user['full_name'].split()[:2]])
+
+    # HTML do header
+    header_html = f"""
+    <div style="background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+                padding: 1rem 2rem;
+                border-bottom: 1px solid #e0e0e0;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin: -4rem -4rem 2rem -4rem;
+                position: sticky;
+                top: 0;
+                z-index: 999;">
+
+        <!-- Logo e Navegação -->
+        <div style="display: flex; align-items: center; gap: 3rem;">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <span style="font-size: 2rem;">🐾</span>
+                <span style="font-size: 1.5rem; font-weight: 600; color: #5B9A9E;">BadiLab</span>
+            </div>
+        </div>
+
+        <!-- User Profile -->
+        <div style="display: flex; align-items: center; gap: 1rem; padding: 0.5rem 1rem; background: #f8f9fa; border-radius: 50px;">
+            <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">
+                {initials}
+            </div>
+            <div>
+                <div style="font-weight: 600; color: #2c3e50;">{current_user['full_name']}</div>
+                <div style="font-size: 0.85rem; color: #7f8c8d;">@{current_user['username']}</div>
+            </div>
+        </div>
+    </div>
+    """
+
+    st.markdown(header_html, unsafe_allow_html=True)
+
+    # Navegação com tabs do Streamlit (mais funcional)
+    nav_options = ["Dashboard", "Nova Consulta", "Transcrições", "Configurações"]
+    if current_user['role'] == 'admin':
+        nav_options.append("Usuários")
+
+    # Mapear página atual para índice
+    page_map = {
+        "Dashboard": 0,
+        "Nova Consulta": 1,
+        "Transcrições": 2,
+        "Configurações": 3,
+        "Usuários": 4
+    }
+
+    default_index = page_map.get(current_page, 0)
+
+    selected = st.radio(
+        "nav",
+        nav_options,
+        index=default_index,
+        horizontal=True,
+        label_visibility="collapsed",
+        key="main_nav"
+    )
+
+    # Botão de logout
+    col1, col2 = st.columns([6, 1])
+    with col2:
+        if st.button("🚪 Sair", use_container_width=True, key="logout_btn"):
+            st.session_state['authenticated'] = False
+            st.session_state['user'] = None
+            st.rerun()
+
+    st.markdown("---")
+
+    return selected
 
 # Initialize services
 @st.cache_resource
@@ -193,85 +441,29 @@ if not st.session_state['authenticated']:
 current_user = st.session_state['user']
 # ========================================================
 
-# Sidebar
-with st.sidebar:
-    logo_path = Path(__file__).parent / "badi_logo.png"
-    if logo_path.exists():
-        st.image(str(logo_path), width=150)
-    else:
-        st.write("**BadiLab**")
-    st.title("🏥 Vet Docs")
-    st.markdown("---")
+# Renderizar header horizontal com navegação
+if 'current_page' not in st.session_state:
+    st.session_state['current_page'] = "Dashboard"
 
-    # Menu de navegação
-    menu_options = ["📊 Dashboard", "➕ Nova Consulta", "📋 Histórico", "⚙️ Configurações"]
-    
-    # Adicionar opção de gerenciamento de usuários para admins
-    if current_user['role'] == 'admin':
-        menu_options.append("👥 Usuários")
-    
-    menu = st.radio(
-        "Navegação",
-        menu_options,
-        label_visibility="collapsed"
-    )
+menu = render_header(current_user, st.session_state['current_page'])
+st.session_state['current_page'] = menu
 
-    st.markdown("---")
-    
-    # Configurações de IA (Expander)
-    with st.expander("🤖 Configurações de IA", expanded=False):
-        # Seleção de Provedor de Transcrição
-        transcription_provider = st.radio(
-            "🎙️ Transcrição",
-            ["OpenAI Whisper (Local)", "Google Gemini (Nuvem)"],
-            index=0 if config.TRANSCRIPTION_PROVIDER == "openai_whisper" else 1,
-            help="Whisper: Roda no seu PC (grátis, offline). Gemini: Roda na nuvem (rápido, requer chave)."
-        )
-        
-        # Atualizar config
-        new_transcription_provider = "openai_whisper" if "Whisper" in transcription_provider else "google_gemini"
-        if new_transcription_provider != config.TRANSCRIPTION_PROVIDER:
-            config.TRANSCRIPTION_PROVIDER = new_transcription_provider
-            st.toast(f"Provedor de transcrição alterado para: {new_transcription_provider}")
+# Mapear menu para as antigas chaves
+menu_map = {
+    "Dashboard": "📊 Dashboard",
+    "Nova Consulta": "➕ Nova Consulta",
+    "Transcrições": "📋 Histórico",
+    "Configurações": "⚙️ Configurações",
+    "Usuários": "👥 Usuários"
+}
 
-        st.markdown("---")
-
-        # Seleção de Provedor de LLM (Relatório)
-        llm_provider = st.radio(
-            "🧠 Inteligência (Relatório)",
-            ["Anthropic Claude 3.5", "Google Gemini 1.5 Pro"],
-            index=0 if config.LLM_PROVIDER == "anthropic_claude" else 1,
-            help="Claude: Melhor raciocínio clínico. Gemini: Janela de contexto maior."
-        )
-
-        # Atualizar config
-        new_llm_provider = "anthropic_claude" if "Claude" in llm_provider else "google_gemini"
-        if new_llm_provider != config.LLM_PROVIDER:
-            config.LLM_PROVIDER = new_llm_provider
-            st.toast(f"Provedor de LLM alterado para: {new_llm_provider}")
-            
-        # Verificar API Keys
-        if new_transcription_provider == "google_gemini" or new_llm_provider == "google_gemini":
-            if not config.GOOGLE_API_KEY:
-                st.error("⚠️ GOOGLE_API_KEY não encontrada no .env!")
-
-    st.markdown("---")
-
-    # Estatísticas resumidas na sidebar
-    stats = get_stats()
-    st.metric("Relatórios Hoje", stats['relatorios_hoje'])
-    st.metric("Total de Relatórios", stats['total_relatorios'])
-    st.metric("Custo Hoje", f"${stats['custo_hoje']:.2f}")
-
-    # Informações do usuário e botão de logout
-    show_user_menu(current_user)
-    
-    st.markdown("---")
-    st.caption("v1.8 - Auth + Supabase Ready")
+menu = menu_map.get(menu, "📊 Dashboard")
 
 # Conteúdo principal
 if menu == "📊 Dashboard":
-    st.markdown('<p class="main-header">🏥 Dashboard do Sistema</p>', unsafe_allow_html=True)
+    # Título da página
+    st.markdown('<div class="page-title">Dashboard</div>', unsafe_allow_html=True)
+    st.markdown('<div class="page-subtitle">Visão geral do sistema de documentação veterinária</div>', unsafe_allow_html=True)
 
     # Verificar se há um relatório para visualizar
     if 'view_report' in st.session_state and st.session_state['view_report']:
@@ -293,47 +485,50 @@ if menu == "📊 Dashboard":
 
         st.markdown("---")
 
-    # Métricas principais
+    # Obter estatísticas
+    stats = get_stats()
+
+    # Métricas principais com design moderno
     col1, col2, col3, col4 = st.columns(4)
 
     with col1:
-        st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-        st.metric(
-            label="📝 Consultas Hoje",
-            value=stats['relatorios_hoje'],
-            delta=f"+{stats['relatorios_hoje']}" if stats['relatorios_hoje'] > 0 else "0"
-        )
-        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown(f"""
+        <div class="metric-card">
+            <div style="font-size: 2.5rem; color: #5B9A9E; margin-bottom: 0.5rem;">📝</div>
+            <div style="font-size: 2rem; font-weight: 700; color: #2c3e50;">{stats['relatorios_hoje']}</div>
+            <div style="font-size: 0.9rem; color: #7f8c8d;">Consultas Hoje</div>
+        </div>
+        """, unsafe_allow_html=True)
 
     with col2:
-        st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-        st.metric(
-            label="📊 Total de Consultas",
-            value=stats['total_relatorios'],
-            delta=None
-        )
-        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown(f"""
+        <div class="metric-card">
+            <div style="font-size: 2.5rem; color: #5B9A9E; margin-bottom: 0.5rem;">📊</div>
+            <div style="font-size: 2rem; font-weight: 700; color: #2c3e50;">{stats['total_relatorios']}</div>
+            <div style="font-size: 0.9rem; color: #7f8c8d;">Total de Consultas</div>
+        </div>
+        """, unsafe_allow_html=True)
 
     with col3:
-        st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-        st.metric(
-            label="💰 Custo Total",
-            value=f"${stats['custo_total']:.2f}",
-            delta=f"-${stats['custo_hoje']:.2f} hoje" if stats['custo_hoje'] > 0 else None
-        )
-        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown(f"""
+        <div class="metric-card">
+            <div style="font-size: 2.5rem; color: #5B9A9E; margin-bottom: 0.5rem;">💰</div>
+            <div style="font-size: 2rem; font-weight: 700; color: #2c3e50;">${stats['custo_total']:.2f}</div>
+            <div style="font-size: 0.9rem; color: #7f8c8d;">Custo Total</div>
+        </div>
+        """, unsafe_allow_html=True)
 
     with col4:
-        st.markdown('<div class="metric-card">', unsafe_allow_html=True)
-        st.metric(
-            label="⚡ Economia",
-            value="95%",
-            delta="vs Áudio" if stats['relatorios_hoje'] > 0 else None,
-            delta_color="normal"
-        )
-        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown(f"""
+        <div class="metric-card">
+            <div style="font-size: 2.5rem; color: #5B9A9E; margin-bottom: 0.5rem;">⚡</div>
+            <div style="font-size: 2rem; font-weight: 700; color: #2c3e50;">95%</div>
+            <div style="font-size: 0.9rem; color: #7f8c8d;">Economia vs Áudio</div>
+        </div>
+        """, unsafe_allow_html=True)
 
-    st.markdown("---")
+    st.markdown("")
+    st.markdown("")
 
     # Últimas consultas
     st.subheader("📋 Últimas Consultas")
@@ -402,7 +597,10 @@ if menu == "📊 Dashboard":
             st.plotly_chart(fig_bar, width='stretch')
 
 elif menu == "➕ Nova Consulta":
-    st.markdown('<p class="main-header">➕ Nova Consulta Veterinária</p>', unsafe_allow_html=True)
+    st.markdown('<div class="page-title">Nova Consulta Veterinária</div>', unsafe_allow_html=True)
+    st.markdown('<div class="page-subtitle">Processe áudio ou cole transcrição para gerar relatório médico completo</div>', unsafe_allow_html=True)
+
+    st.markdown("")
 
     # Botão de Limpar Tudo (fora do formulário, no topo)
     col_header1, col_header2 = st.columns([4, 1])
@@ -877,7 +1075,17 @@ elif menu == "➕ Nova Consulta":
             st.rerun()
 
 elif menu == "📋 Histórico":
-    st.markdown('<p class="main-header">📋 Histórico de Consultas</p>', unsafe_allow_html=True)
+    # Header da página
+    col_title, col_btn = st.columns([4, 1])
+    with col_title:
+        st.markdown('<div class="page-title">Gerenciamento de Transcrições</div>', unsafe_allow_html=True)
+        st.markdown('<div class="page-subtitle">Visualize, organize e busque transcrições veterinárias de forma eficiente.</div>', unsafe_allow_html=True)
+    with col_btn:
+        if st.button("➕ Nova Transcrição", type="primary", use_container_width=True, key="new_transcription_btn"):
+            st.session_state['current_page'] = "Nova Consulta"
+            st.rerun()
+
+    st.markdown("")
 
     # Modo de edição
     if st.session_state.get('edit_mode') and st.session_state.get('editing_report'):
@@ -926,19 +1134,38 @@ elif menu == "📋 Histórico":
 
     else:
         # Modo de visualização normal
-        # Filtros
-        col1, col2, col3 = st.columns(3)
+        # Container de filtros
+        st.markdown('<div class="filter-container">', unsafe_allow_html=True)
 
-        with col1:
-            search_term = st.text_input("🔍 Buscar", placeholder="Nome do paciente...")
+        col_filter1, col_filter2, col_filter3 = st.columns([2, 1.5, 2.5])
 
-        with col2:
-            filter_date = st.date_input("📅 Filtrar por data", value=None)
+        with col_filter1:
+            st.markdown("**Filtrar por Data:**")
+            col_date1, col_date2 = st.columns(2)
+            with col_date1:
+                date_start = st.date_input("De", value=None, key="date_start", label_visibility="collapsed")
+            with col_date2:
+                date_end = st.date_input("Até", value=None, key="date_end", label_visibility="collapsed")
 
-        with col3:
-            sort_by = st.selectbox("🔄 Ordenar por", ["Mais recentes", "Mais antigos", "Nome (A-Z)"])
+        with col_filter2:
+            st.markdown("**Status:**")
+            status_filter = st.selectbox(
+                "Status",
+                ["Todos", "Concluído", "Em Progresso", "Pendente"],
+                label_visibility="collapsed",
+                key="status_filter"
+            )
 
-        st.markdown("---")
+        with col_filter3:
+            st.markdown("**Buscar Paciente:**")
+            search_term = st.text_input(
+                "Buscar",
+                placeholder="Digite o nome do paciente...",
+                label_visibility="collapsed",
+                key="search_patient"
+            )
+
+        st.markdown('</div>', unsafe_allow_html=True)
 
         # Obter relatórios
         recent = get_recent_reports(100)  # Todos
@@ -947,131 +1174,194 @@ elif menu == "📋 Histórico":
         if search_term:
             recent = [r for r in recent if search_term.lower() in r['paciente'].lower()]
 
-        if filter_date:
-            date_str = filter_date.strftime("%d/%m/%Y")
-            recent = [r for r in recent if date_str in r['data']]
+        if date_start or date_end:
+            filtered = []
+            for r in recent:
+                try:
+                    # Parse da data do relatório
+                    parts = r['caminho'].stem.split('_', 2)
+                    if len(parts) >= 2:
+                        date_str = parts[0]
+                        report_date = datetime.strptime(date_str, "%Y%m%d").date()
 
-        # Aplicar ordenação
-        if sort_by == "Mais antigos":
-            recent = list(reversed(recent))
-        elif sort_by == "Nome (A-Z)":
-            recent = sorted(recent, key=lambda x: x['paciente'])
+                        if date_start and date_end:
+                            if date_start <= report_date <= date_end:
+                                filtered.append(r)
+                        elif date_start:
+                            if report_date >= date_start:
+                                filtered.append(r)
+                        elif date_end:
+                            if report_date <= date_end:
+                                filtered.append(r)
+                except:
+                    continue
+            recent = filtered
 
-        # Exibir resultados
-        st.write(f"**Total: {len(recent)} consulta(s)**")
+        # Mock: adicionar status aos relatórios (em produção, isso viria do banco)
+        import random
+        for r in recent:
+            if 'status' not in r:
+                r['status'] = random.choice(['Concluído', 'Em Progresso', 'Pendente'])
 
-        if recent:
-            for idx, report in enumerate(recent):
-                with st.expander(f"🐾 {report['paciente']} - {report['data']} - {report['motivo']}"):
-                    col1, col2 = st.columns([3, 1])
+        # Filtrar por status
+        if status_filter != "Todos":
+            recent = [r for r in recent if r.get('status') == status_filter]
 
-                    with col1:
-                        st.write(f"**Data:** {report['data']}")
-                        st.write(f"**Paciente:** {report['paciente']}")
-                        st.write(f"**Motivo:** {report['motivo']}")
-                        st.write(f"**Arquivo:** {report['arquivo']}")
+        # Paginação
+        items_per_page = 5
+        total_items = len(recent)
+        total_pages = max(1, (total_items + items_per_page - 1) // items_per_page)
 
-                    with col2:
-                        # Botão de visualizar
-                        if st.button("👁️ Visualizar", key=f"view_hist_{idx}", use_container_width=True):
-                            with open(report['caminho'], 'r', encoding='utf-8') as f:
-                                st.markdown(f.read())
+        if 'current_page_num' not in st.session_state:
+            st.session_state['current_page_num'] = 1
 
-                        # Botão de editar
-                        if st.button("✏️ Editar", key=f"edit_hist_{idx}", use_container_width=True):
-                            # Salvar relatório para edição no session_state
-                            st.session_state['editing_report'] = {
-                                'caminho': report['caminho'],
-                                'paciente': report['paciente'],
-                                'arquivo': report['arquivo']
-                            }
-                            st.session_state['edit_mode'] = True
-                            st.rerun()
+        start_idx = (st.session_state['current_page_num'] - 1) * items_per_page
+        end_idx = min(start_idx + items_per_page, total_items)
+        paginated_reports = recent[start_idx:end_idx]
 
-                        st.markdown("---")
+        # Exibir contador
+        st.markdown(f"""
+        <div style="margin: 1rem 0; color: #7f8c8d;">
+            Mostrando <strong>{start_idx + 1}-{end_idx}</strong> de <strong>{total_items}</strong> transcrições
+        </div>
+        """, unsafe_allow_html=True)
 
-                        # Botões de download em múltiplos formatos
-                        st.write("**⬇️ Baixar:**")
-                        col_md_h, col_txt_h, col_pdf_h = st.columns(3)
+        # Tabela estilo mockup
+        if paginated_reports:
+            # Header da tabela
+            st.markdown("""
+            <div style="background: white; border-radius: 12px; border: 1px solid #e0e0e0; overflow: hidden;">
+                <div style="display: grid; grid-template-columns: 0.8fr 1fr 2fr 1.5fr 1fr 1fr; padding: 1rem; background: #f8f9fa; font-weight: 600; color: #2c3e50; border-bottom: 2px solid #e0e0e0;">
+                    <div>ID</div>
+                    <div>DATA</div>
+                    <div>PACIENTE (RAÇA/ESPÉCIE)</div>
+                    <div>VETERINÁRIO RESPONSÁVEL</div>
+                    <div>STATUS</div>
+                    <div style="text-align: center;">AÇÕES</div>
+                </div>
+            """, unsafe_allow_html=True)
 
-                        with open(report['caminho'], 'r', encoding='utf-8') as f:
-                            md_content_h = f.read()
+            # Linhas da tabela
+            for idx, report in enumerate(paginated_reports):
+                # Gerar ID único
+                parts = report['caminho'].stem.split('_', 2)
+                if len(parts) >= 2:
+                    tr_id = f"TR-{parts[0][-4:]}"
+                else:
+                    tr_id = f"TR-{idx:04d}"
 
-                        with col_md_h:
-                            st.download_button(
-                                label="MD",
-                                data=md_content_h,
-                                file_name=report['arquivo'],
-                                mime="text/markdown",
-                                key=f"download_md_hist_{idx}",
+                # Mock: veterinário responsável
+                vet_responsavel = current_user['full_name'].split()[0] + " " + current_user['full_name'].split()[-1] if len(current_user['full_name'].split()) > 1 else current_user['full_name']
+
+                # Badge de status
+                status = report.get('status', 'Concluído')
+                if status == 'Concluído':
+                    status_html = '<span class="status-badge status-concluido">Concluído</span>'
+                elif status == 'Em Progresso':
+                    status_html = '<span class="status-badge status-em-progresso">Em Progresso</span>'
+                else:
+                    status_html = '<span class="status-badge status-pendente">Pendente</span>'
+
+                # Parse data do arquivo
+                date_formatted = report['data'].split()[0] if report['data'] else "N/A"
+
+                # Linha da tabela
+                row_html = f"""
+                <div style="display: grid; grid-template-columns: 0.8fr 1fr 2fr 1.5fr 1fr 1fr; padding: 1rem; border-bottom: 1px solid #e0e0e0; align-items: center; background: white;">
+                    <div style="font-weight: 600; color: #5B9A9E;">{tr_id}</div>
+                    <div style="color: #2c3e50;">{date_formatted}</div>
+                    <div style="color: #2c3e50;">
+                        <strong>{report['paciente']}</strong><br>
+                        <span style="font-size: 0.85rem; color: #7f8c8d;">(Espécie não especificada)</span>
+                    </div>
+                    <div style="color: #2c3e50;">{vet_responsavel}</div>
+                    <div>{status_html}</div>
+                    <div style="text-align: center;">
+                """
+
+                st.markdown(row_html, unsafe_allow_html=True)
+
+                # Botões de ação
+                col_edit, col_download = st.columns(2)
+
+                with col_edit:
+                    if st.button("✏️", key=f"edit_table_{idx}", help="Editar", use_container_width=True):
+                        st.session_state['editing_report'] = {
+                            'caminho': report['caminho'],
+                            'paciente': report['paciente'],
+                            'arquivo': report['arquivo']
+                        }
+                        st.session_state['edit_mode'] = True
+                        st.rerun()
+
+                with col_download:
+                    with open(report['caminho'], 'r', encoding='utf-8') as f:
+                        md_content = f.read()
+
+                    st.download_button(
+                        label="⬇️",
+                        data=md_content,
+                        file_name=report['arquivo'],
+                        mime="text/markdown",
+                        key=f"download_table_{idx}",
+                        help="Download",
+                        use_container_width=True
+                    )
+
+                st.markdown("</div>", unsafe_allow_html=True)
+
+            # Fechar container da tabela
+            st.markdown("</div>", unsafe_allow_html=True)
+
+            # Paginação
+            st.markdown("")
+            col_prev, col_pages, col_next = st.columns([1, 6, 1])
+
+            with col_prev:
+                if st.button("◀", key="prev_page", disabled=(st.session_state['current_page_num'] == 1)):
+                    st.session_state['current_page_num'] -= 1
+                    st.rerun()
+
+            with col_pages:
+                # Botões de página
+                pages_to_show = []
+                if total_pages <= 7:
+                    pages_to_show = list(range(1, total_pages + 1))
+                else:
+                    if st.session_state['current_page_num'] <= 3:
+                        pages_to_show = [1, 2, 3, 4, 5, "...", total_pages]
+                    elif st.session_state['current_page_num'] >= total_pages - 2:
+                        pages_to_show = [1, "...", total_pages - 4, total_pages - 3, total_pages - 2, total_pages - 1, total_pages]
+                    else:
+                        pages_to_show = [1, "...", st.session_state['current_page_num'] - 1, st.session_state['current_page_num'], st.session_state['current_page_num'] + 1, "...", total_pages]
+
+                cols = st.columns(len(pages_to_show))
+                for i, page in enumerate(pages_to_show):
+                    with cols[i]:
+                        if page == "...":
+                            st.markdown("<div style='text-align: center; padding: 0.5rem;'>...</div>", unsafe_allow_html=True)
+                        else:
+                            if st.button(
+                                str(page),
+                                key=f"page_{page}",
+                                type="primary" if page == st.session_state['current_page_num'] else "secondary",
                                 use_container_width=True
-                            )
+                            ):
+                                st.session_state['current_page_num'] = page
+                                st.rerun()
 
-                        with col_txt_h:
-                            txt_content_h = convert_md_to_txt(md_content_h)
-                            txt_filename_h = Path(report['arquivo']).stem + '.txt'
-                            st.download_button(
-                                label="TXT",
-                                data=txt_content_h,
-                                file_name=txt_filename_h,
-                                mime="text/plain",
-                                key=f"download_txt_hist_{idx}",
-                                use_container_width=True
-                            )
-
-                        with col_pdf_h:
-                            pdf_filename_h = Path(report['arquivo']).stem + '.pdf'
-                            pdf_bytes_h = convert_md_to_pdf(md_content_h, pdf_filename_h)
-                            st.download_button(
-                                label="PDF",
-                                data=pdf_bytes_h,
-                                file_name=pdf_filename_h,
-                                mime="application/pdf",
-                                key=f"download_pdf_hist_{idx}",
-                                use_container_width=True
-                            )
-
-    col1, col2, col3 = st.columns(3)
-
-    with col1:
-        if st.button("🗑️ Limpar Cache"):
-            st.cache_data.clear()
-            st.success("Cache limpo!")
-
-    with col2:
-        if st.button("📁 Abrir Pasta de Relatórios"):
-            try:
-                # Converter Path para string e abrir pasta
-                folder_path = str(config.REPORT_DIR.resolve())
-
-                # Usar método apropriado para cada sistema operacional
-                if sys.platform == 'win32':
-                    os.startfile(folder_path)
-                elif sys.platform == 'darwin':  # macOS
-                    os.system(f'open "{folder_path}"')
-                else:  # Linux
-                    os.system(f'xdg-open "{folder_path}"')
-
-                st.success(f"Pasta aberta: {folder_path}")
-                logging.info(f"Pasta de relatórios aberta: {folder_path}")
-            except Exception as e:
-                st.error(f"Erro ao abrir pasta: {e}")
-                logging.error(f"Erro ao abrir pasta de relatórios: {e}")
-                # Mostrar caminho alternativo
-                st.info(f"Abra manualmente: {config.REPORT_DIR}")
-
-    with col3:
-        if st.button("📚 Ver Documentação"):
-            readme_path = Path(__file__).parent / "README.md"
-            if readme_path.exists():
-                with open(readme_path, 'r', encoding='utf-8') as f:
-                    st.markdown(f.read())
+            with col_next:
+                if st.button("▶", key="next_page", disabled=(st.session_state['current_page_num'] == total_pages)):
+                    st.session_state['current_page_num'] += 1
+                    st.rerun()
         else:
-            st.info("Nenhuma consulta encontrada com os filtros aplicados.")
+            st.info("📝 Nenhuma transcrição encontrada com os filtros aplicados.")
 
 elif menu == "⚙️ Configurações":
-    st.markdown('<p class="main-header">⚙️ Configurações do Sistema</p>', unsafe_allow_html=True)
-    
+    st.markdown('<div class="page-title">Configurações</div>', unsafe_allow_html=True)
+    st.markdown('<div class="page-subtitle">Informações do sistema e configurações de IA</div>', unsafe_allow_html=True)
+
+    st.markdown("")
     st.subheader("📊 Informações do Sistema")
     
     col1, col2 = st.columns(2)
