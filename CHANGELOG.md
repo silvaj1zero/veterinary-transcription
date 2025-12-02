@@ -1,4 +1,30 @@
-# 📋 Histórico de Alterações
+## [1.9.1] - 02/12/2025
+
+### � Correções
+
+- **Upload de arquivos M4A corrigido**
+  - Adicionada detecção automática de MIME type para arquivos M4A
+  - M4A agora usa corretamente o MIME type `audio/mp4`
+  - Resolve erro "Unknown mime type" ao fazer upload no Google Gemini
+
+### ✨ Melhorias de UX
+
+- **Indicador de progresso detalhado**
+  - Barra de progresso visual (0-100%) durante processamento
+  - Mensagens de status por etapa ("Inicializando", "Transcrevendo", "Gerando relatório")
+  - Estimativas de tempo exibidas:
+    - 5-10 minutos para processamento de áudio
+    - 30 segundos para processamento de texto
+  - Limpeza automática dos indicadores em caso de erro
+  - Info boxes atualizadas com ícones ⏱️ e 💰
+
+### 🔧 Técnico
+
+- Modificado: `services/transcription_service.py` - Função `_get_mime_type()` adicionada
+- Modificado: `app.py` - Substituído `st.spinner` por indicador de progresso detalhado
+- Commit: `22dd95e`
+
+---
 
 ## [1.9] - 01/12/2025
 
