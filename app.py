@@ -68,6 +68,85 @@ except EnvironmentError as e:
 import config
 from transcribe_consult import VeterinaryTranscription
 
+# ============================================================================
+# SEGURANÇA: Validação de API Key no Startup
+# ============================================================================
+
+def validate_api_keys():
+    """
+    Valida se as API keys estão configuradas e não foram reportadas como vazadas.
+    Retorna True se tudo OK, False se houver problemas.
+    """
+    # Verificar se pelo menos uma API key está configurada
+    has_anthropic = bool(config.ANTHROPIC_API_KEY)
+    has_google = bool(config.GOOGLE_API_KEY)
+    
+    if not has_anthropic and not has_google:
+        st.error("❌ Nenhuma API key configurada! Configure ANTHROPIC_API_KEY ou GOOGLE_API_KEY no arquivo .env")
+        st.stop()
+        return False
+    
+    # Validar Anthropic API key se configurada e sendo usada
+    if config.LLM_PROVIDER == "anthropic_claude" and has_anthropic:
+        try:
+            client = anthropic.Anthropic(api_key=config.ANTHROPIC_API_KEY)
+            # Fazer uma chamada mínima para validar
+            client.messages.create(
+                model="claude-sonnet-4-20250514",
+                max_tokens=10,
+                messages=[{"role": "user", "content": "test"}]
+            )
+            logging.info("✅ Anthropic API key validada com sucesso")
+        except anthropic.PermissionDeniedError as e:
+            st.error("""
+            🚨 **ALERTA DE SEGURANÇA CRÍTICO**
+            
+            Sua API key da Anthropic foi reportada como **VAZADA**!
+            
+            **AÇÃO IMEDIATA NECESSÁRIA:**
+            1. Acesse: https://console.anthropic.com/settings/keys
+            2. Revogue a chave atual
+            3. Gere uma nova chave
+            4. Atualize o arquivo .env com a nova chave
+            5. Reinicie a aplicação
+            
+            **NUNCA** compartilhe sua API key ou faça commit dela no Git!
+            """)
+            logging.critical(f"🚨 API key vazada detectada! Error: {e}")
+            st.stop()
+            return False
+        except anthropic.AuthenticationError as e:
+            st.error("❌ API key da Anthropic inválida. Verifique o arquivo .env")
+            logging.error(f"Authentication error: {e}")
+            st.stop()
+            return False
+        except Exception as e:
+            # Outros erros não impedem o startup (pode ser problema de rede temporário)
+            logging.warning(f"Não foi possível validar API key da Anthropic: {e}")
+    
+    # Validar Google API key se configurada e sendo usada
+    if config.LLM_PROVIDER == "google_gemini" and has_google:
+        try:
+            import google.generativeai as genai
+            genai.configure(api_key=config.GOOGLE_API_KEY)
+            # Teste simples: listar modelos (sem limit, pois algumas versões não suportam)
+            for m in genai.list_models():
+                break
+            logging.info("✅ Google API key validada com sucesso")
+        except Exception as e:
+            st.error(f"❌ Erro na validação do Google Gemini: {str(e)}")
+            st.warning("Verifique se sua GOOGLE_API_KEY no arquivo .env está correta e ativa.")
+            logging.error(f"Google API error: {e}")
+            st.stop()
+            return False
+    
+    return True
+
+# Executar validação apenas uma vez no startup
+if 'api_keys_validated' not in st.session_state:
+    validate_api_keys()
+    st.session_state['api_keys_validated'] = True
+
 # Configuração da página
 st.set_page_config(
     page_title="Sistema Veterinário",
@@ -237,18 +316,10 @@ with st.sidebar:
         st.markdown("---")
 
         # Seleção de Provedor de LLM (Relatório)
-        llm_provider = st.radio(
-            "🧠 Inteligência (Relatório)",
-            ["Anthropic Claude 3.5", "Google Gemini 1.5 Pro"],
-            index=0 if config.LLM_PROVIDER == "anthropic_claude" else 1,
-            help="Claude: Melhor raciocínio clínico. Gemini: Janela de contexto maior."
-        )
-
-        # Atualizar config
-        new_llm_provider = "anthropic_claude" if "Claude" in llm_provider else "google_gemini"
-        if new_llm_provider != config.LLM_PROVIDER:
-            config.LLM_PROVIDER = new_llm_provider
-            st.toast(f"Provedor de LLM alterado para: {new_llm_provider}")
+        # Anthropic removido temporariamente por segurança/decisão do usuário
+        st.info("🧠 Inteligência: **Google Gemini 1.5 Pro**")
+        config.LLM_PROVIDER = "google_gemini"
+        new_llm_provider = "google_gemini"
             
         # Verificar API Keys
         if new_transcription_provider == "google_gemini" or new_llm_provider == "google_gemini":
@@ -729,24 +800,6 @@ elif menu == "➕ Nova Consulta":
                                 
                                 st.rerun()
 
-                        except anthropic.RateLimitError as e:
-                            progress_bar.empty()
-                            status_text.empty()
-                            error_msg = "Limite de requisições da API excedido. Por favor, aguarde alguns minutos antes de tentar novamente."
-                            logging.error(f"Rate limit error: {e}")
-                            st.error(f"❌ {error_msg}")
-                        except anthropic.APIConnectionError as e:
-                            progress_bar.empty()
-                            status_text.empty()
-                            error_msg = "Erro de conexão com a API Claude. Verifique sua conexão com a internet."
-                            logging.error(f"API connection error: {e}")
-                            st.error(f"❌ {error_msg}")
-                        except anthropic.AuthenticationError as e:
-                            progress_bar.empty()
-                            status_text.empty()
-                            error_msg = "Erro de autenticação. Verifique se sua ANTHROPIC_API_KEY está correta no arquivo .env"
-                            logging.error(f"Authentication error: {e}")
-                            st.error(f"❌ {error_msg}")
                         except FileNotFoundError as e:
                             progress_bar.empty()
                             status_text.empty()

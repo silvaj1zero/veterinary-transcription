@@ -1,5 +1,4 @@
 import logging
-import anthropic
 import google.generativeai as genai
 import config
 from abc import ABC, abstractmethod
@@ -12,6 +11,12 @@ class LLMService(ABC):
 
 class ClaudeLLMService(LLMService):
     def __init__(self, api_key=config.ANTHROPIC_API_KEY):
+        # Importação tardia para evitar dependência hardcoded
+        try:
+            import anthropic
+        except ImportError:
+            raise ImportError("Biblioteca 'anthropic' não instalada.")
+            
         if not api_key:
             raise ValueError("ANTHROPIC_API_KEY não configurada")
         self.client = anthropic.Anthropic(api_key=api_key)
@@ -57,9 +62,11 @@ class GeminiLLMService(LLMService):
 def get_llm_service():
     provider = config.LLM_PROVIDER
     
-    if provider == "google_gemini":
-        logging.info("Usando provedor LLM: Google Gemini")
-        return GeminiLLMService()
-    else:
+    # Forçar Gemini se o provedor não for explicitamente Claude
+    if provider == "anthropic_claude":
         logging.info("Usando provedor LLM: Anthropic Claude")
         return ClaudeLLMService()
+    else:
+        # Default seguro para Gemini
+        logging.info(f"Usando provedor LLM: Google Gemini (Config: {provider})")
+        return GeminiLLMService()
